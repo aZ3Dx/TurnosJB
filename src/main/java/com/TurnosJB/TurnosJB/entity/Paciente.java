@@ -28,6 +28,6 @@ public class Paciente {
     private LocalDate fechaAlta;
 
     @OneToMany(mappedBy = "paciente")
-    private Set<Turno> turnos = new HashSet<>()
+    private Set<Turno> turnos = new HashSet<>();
 
 }
