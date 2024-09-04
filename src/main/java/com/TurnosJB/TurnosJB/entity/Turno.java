@@ -22,6 +22,7 @@ public class Turno {
 
     @ManyToOne
     private Paciente paciente;
+    @ManyToOne
     private Odontologo odontologo;
     private LocalDate fecha;
     private LocalTime hora;

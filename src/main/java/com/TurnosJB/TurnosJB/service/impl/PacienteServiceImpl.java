@@ -1,19 +1,29 @@
 package com.TurnosJB.TurnosJB.service.impl;
 
 import com.TurnosJB.TurnosJB.entity.Paciente;
+import com.TurnosJB.TurnosJB.repository.IPacienteRepository;
 import com.TurnosJB.TurnosJB.service.IPacienteService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
+@Service
 public class PacienteServiceImpl implements IPacienteService {
-    @Override
-    public void guardar(Paciente paciente) {
 
+    @Autowired
+    private IPacienteRepository iPacienteRepository;
+
+    @Override
+    public Paciente guardar(Paciente paciente) {
+        return iPacienteRepository.save(paciente);
     }
 
     @Override
     public Paciente buscarPorId(Long id) {
-        return null;
+        Optional<Paciente> pacienteBuscado = iPacienteRepository.findById(id);
+        return pacienteBuscado.orElse(null);
     }
 
     @Override
