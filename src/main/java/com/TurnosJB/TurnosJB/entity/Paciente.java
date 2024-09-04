@@ -23,9 +23,11 @@ public class Paciente {
     private Long id;
     private String nombre;
     private String apellido;
-    private String domicilio;
     private String dni;
     private LocalDate fechaAlta;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private Domicilio domicilio;
 
     @OneToMany(mappedBy = "paciente")
     private Set<Turno> turnos = new HashSet<>();

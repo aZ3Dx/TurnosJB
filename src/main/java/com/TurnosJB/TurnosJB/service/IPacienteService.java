@@ -12,7 +12,7 @@ public interface IPacienteService {
 
     void eliminar(Long id);
 
-    void actualizar(Paciente paciente);
+    Paciente actualizar(Paciente paciente);
 
     List<Paciente> listar();
 }

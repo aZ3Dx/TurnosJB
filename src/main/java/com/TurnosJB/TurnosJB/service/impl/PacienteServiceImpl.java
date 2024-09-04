@@ -28,16 +28,16 @@ public class PacienteServiceImpl implements IPacienteService {
 
     @Override
     public void eliminar(Long id) {
-
+        iPacienteRepository.deleteById(id);
     }
 
     @Override
-    public void actualizar(Paciente paciente) {
-
+    public Paciente actualizar(Paciente paciente) {
+        return iPacienteRepository.save(paciente);
     }
 
     @Override
     public List<Paciente> listar() {
-        return List.of();
+        return iPacienteRepository.findAll();
     }
 }

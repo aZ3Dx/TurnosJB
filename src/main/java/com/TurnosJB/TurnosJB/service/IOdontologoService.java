@@ -12,7 +12,7 @@ public interface IOdontologoService {
 
     void eliminar(Long id);
 
-    void actualizar(Odontologo odontologo);
+    Odontologo actualizar(Odontologo odontologo);
 
     List<Odontologo> listar();
 }
