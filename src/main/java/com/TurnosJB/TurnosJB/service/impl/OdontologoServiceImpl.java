@@ -1,6 +1,7 @@
 package com.TurnosJB.TurnosJB.service.impl;
 
 import com.TurnosJB.TurnosJB.entity.Odontologo;
+import com.TurnosJB.TurnosJB.exception.ResourceNotFoundException;
 import com.TurnosJB.TurnosJB.repository.IOdontologoRepository;
 import com.TurnosJB.TurnosJB.service.IOdontologoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,13 @@ public class OdontologoServiceImpl implements IOdontologoService {
     }
 
     @Override
-    public Odontologo buscarPorId(Long id) {
+    public Odontologo buscarPorId(Long id) throws ResourceNotFoundException {
         Optional<Odontologo> odontologo = odontologoRepository.findById(id);
-        return odontologo.orElse(null);
+        if (odontologo.isPresent()) {
+            return odontologo.get();
+        } else {
+            throw new ResourceNotFoundException("No se encontró el odontólogo con id " + id);
+        }
     }
 
     @Override
