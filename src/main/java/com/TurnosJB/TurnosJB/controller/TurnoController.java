@@ -40,4 +40,10 @@ public class TurnoController {
     public ResponseEntity<Turno> guardar(@RequestBody Turno turno) {
         return ResponseEntity.ok(iTurnoService.guardar(turno));
     }
+
+    @GetMapping("/paciente/{id}")
+    public ResponseEntity<List<Turno>> obtenerTurnosPorPaciente(@PathVariable Long id) {
+        List<Turno> turnos = iTurnoService.obtenerTurnosPorPaciente(id);
+        return ResponseEntity.ok(turnos);
+    }
 }

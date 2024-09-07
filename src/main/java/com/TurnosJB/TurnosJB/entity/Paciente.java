@@ -1,5 +1,7 @@
 package com.TurnosJB.TurnosJB.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,7 +31,9 @@ public class Paciente {
     @OneToOne(cascade = CascadeType.ALL)
     private Domicilio domicilio;
 
-    @OneToMany(mappedBy = "paciente")
-    private Set<Turno> turnos = new HashSet<>();
+//    @OneToMany(mappedBy = "paciente")
+//    //@JsonManagedReference
+//    @JsonIgnore
+//    private Set<Turno> turnos = new HashSet<>();
 
 }

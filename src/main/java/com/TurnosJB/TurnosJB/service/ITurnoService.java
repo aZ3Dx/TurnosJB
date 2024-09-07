@@ -14,4 +14,6 @@ public interface ITurnoService {
     Turno actualizar(Turno turno);
 
     List<Turno> listar();
+
+    List<Turno> obtenerTurnosPorPaciente(Long id);
 }

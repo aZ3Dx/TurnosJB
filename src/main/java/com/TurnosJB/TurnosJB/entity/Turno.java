@@ -1,5 +1,6 @@
 package com.TurnosJB.TurnosJB.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class Turno {
     private Long id;
 
     @ManyToOne
+    //@JsonBackReference
     private Paciente paciente;
     @ManyToOne
     private Odontologo odontologo;
