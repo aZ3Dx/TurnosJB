@@ -16,4 +16,6 @@ public interface ITurnoService {
     List<Turno> listar();
 
     List<Turno> obtenerTurnosPorPaciente(Long id);
+
+    List<Turno> obtenerTurnosPorOdontologo(Long id);
 }

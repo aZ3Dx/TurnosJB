@@ -73,4 +73,9 @@ public class TurnoServiceImpl implements ITurnoService {
     public List<Turno> obtenerTurnosPorPaciente(Long id) {
         return iTurnoRepository.findByPacienteId(id);
     }
+
+    @Override
+    public List<Turno> obtenerTurnosPorOdontologo(Long id) {
+        return iTurnoRepository.findByOdontologoId(id);
+    }
 }

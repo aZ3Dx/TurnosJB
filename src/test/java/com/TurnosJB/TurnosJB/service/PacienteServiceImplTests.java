@@ -5,11 +5,10 @@ import com.TurnosJB.TurnosJB.entity.Paciente;
 import com.TurnosJB.TurnosJB.service.impl.PacienteServiceImpl;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-//import org.junit.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
@@ -57,7 +56,7 @@ public class PacienteServiceImplTests {
         Paciente pacienteGuardado = pacienteService.guardar(paciente);
 
         // Act
-        Paciente pacienteBuscado = pacienteService.buscarPorId(paciente.getId());
+        Paciente pacienteBuscado = pacienteService.buscarPorId(pacienteGuardado.getId());
 
         // Assert
         assertAll("Verificar paciente buscado",
@@ -94,16 +93,17 @@ public class PacienteServiceImplTests {
 
         // Act
         pacienteGuardado.setDni("87654321");
-        Paciente pacienteActualizado = pacienteService.actualizar(pacienteGuardado);
-        Paciente pacienteBuscado = pacienteService.buscarPorId(pacienteGuardado.getId());
+        pacienteService.actualizar(pacienteGuardado);
+        Paciente pacienteActualizado = pacienteService.buscarPorId(pacienteGuardado.getId());
 
         // Assert
         assertAll("Verificar paciente actualizado",
-                () -> assertEquals("87654321", pacienteBuscado.getDni())
+                () -> assertEquals("87654321", pacienteActualizado.getDni())
         );
     }
 
     @Test
+    @Transactional
     public void testListarPacientes() {
         // Arrange
         Paciente paciente1 = crearPaciente();

@@ -10,4 +10,6 @@ import java.util.List;
 public interface ITurnoRepository extends JpaRepository<Turno, Long> {
 
     List<Turno> findByPacienteId(Long id);
+
+    List<Turno> findByOdontologoId(Long id);
 }
