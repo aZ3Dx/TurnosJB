@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="css/pico.min.css">
+    <title>TurnosJB - Pacientes</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+</head>
+<body class="container">
+<header>
+    <nav>
+        <ul>
+            <li><a href="/" class="secondary"><strong>TurnosJB</strong></a></li>
+        </ul>
+        <ul>
+            <li><a href="pacientes.html" aria-current="page">Pacientes</a></li>
+            <li><a href="odontologos.html">Odontólogos</a></li>
+            <li><a href="turnos.html">Turnos</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <section>
+        <nav aria-label="breadcrumb">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="pacientes.html" aria-current="page">Pacientes</a></li>
+            </ul>
+        </nav>
+    </section>
+    <section>
+        <button id="btn-agregar-paciente">Agregar Paciente</button>
+    </section>
+    <section>
+        <h3>Listado de Pacientes</h3>
+        <div class="overflow-auto">
+            <table>
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Apellido</th>
+                    <th scope="col">DNI</th>
+                    <th scope="col">Fecha Alta</th>
+                    <th scope="col">Calle</th>
+                    <th scope="col">Número</th>
+                    <th scope="col">Localidad</th>
+                    <th scope="col">Provincia</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+                </thead>
+                <tbody id="tbody-pacientes">
+                    <tr>
+                        <th scope="row">${paciente.id}</th>
+                        <td>${paciente.nombre}</td>
+                        <td>${paciente.apellido}</td>
+                        <td>${paciente.dni}</td>
+                        <td>${paciente.fechaAlta}</td>
+                        <td>${paciente.domicilio.calle}</td>
+                        <td>${paciente.domicilio.numero}</td>
+                        <td>${paciente.domicilio.localidad}</td>
+                        <td>${paciente.domicilio.provincia}</td>
+                        <td>
+                            <div style="display: flex">
+                                <button id="btn-editar" data-paciente-id="${paciente.id}" data-tooltip="Editar" class="outline">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round" class="lucide lucide-square-pen">
+                                        <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                        <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
+                                    </svg>
+                                </button>
+                                <button id="btn-borrar" data-paciente-id="${paciente.id}" data-tooltip="Borrar" class="outline contrast">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round" class="lucide lucide-trash">
+                                        <path d="M3 6h18"/>
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Modal para agregar paciente -->
+    <dialog id="dialog-agregar-paciente">
+        <article>
+            <header>
+                <button id="btn-close-form-agregar-paciente" aria-label="Close" rel="prev"></button>
+                <p><strong>Agregar Paciente</strong></p>
+            </header>
+            <form id="form-agregar-paciente">
+                <p>Datos paciente</p>
+                <fieldset role="group">
+                    <label for="nombre" style="display: none">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Nombre">
+                    <label for="apellido" style="display: none">Apellido:</label>
+                    <input type="text" id="apellido" name="apellido" placeholder="Apellido">
+                    <label for="dni" style="display: none">DNI:</label>
+                    <input type="text" id="dni" name="dni" placeholder="DNI">
+                </fieldset>
+
+                <p>Datos domicilio</p>
+                <fieldset role="group">
+                    <label for="domicilio" style="display: none">Calle:</label>
+                    <input type="text" id="domicilio" name="domicilio" placeholder="Calle">
+                    <label for="numero" style="display: none">Número:</label>
+                    <input type="number" id="numero" name="numero" placeholder="Número">
+                </fieldset>
+                <fieldset role="group">
+                    <label for="localidad" style="display: none">Localidad:</label>
+                    <input type="text" id="localidad" name="localidad" placeholder="Localidad">
+                    <label for="provincia" style="display: none">Provincia:</label>
+                    <input type="text" id="provincia" name="provincia" placeholder="Provincia">
+                </fieldset>
+            </form>
+            <footer>
+                <button id="btn-cancelar-form-agregar-paciente" type="button" class="secondary">Cancelar</button>
+                <button id="btn-guardar-form-agregar-paciente" type="button">Guardar</button>
+            </footer>
+        </article>
+    </dialog>
+
+    <!-- Modal para borrar paciente -->
+    <dialog id="dialog-borrar-paciente">
+        <article>
+            <header>
+                <button id="btn-close-form-borrar-paciente" aria-label="Close" rel="prev"></button>
+                <p><strong>Borrar Paciente</strong></p>
+            </header>
+            <p>
+                ¿Seguro que quieres borrar este paciente?
+            </p>
+            <form id="form-borrar-paciente">
+                <fieldset role="group">
+                    <label for="paciente-borrar-id" style="display: none">Id:</label>
+                    <input type="text" id="paciente-borrar-id" name="paciente-borrar-id" disabled>
+                    <label for="paciente-borrar-nombre" style="display: none">Nombre:</label>
+                    <input type="text" id="paciente-borrar-nombre" name="paciente-borrar-nombre" disabled>
+                </fieldset>
+            </form>
+            <footer>
+                <button id="btn-cancelar-form-borrar-paciente" type="button" class="secondary">Cancelar</button>
+                <button id="btn-guardar-form-borrar-paciente" type="button" data-paciente-id="">Borrar</button>
+            </footer>
+        </article>
+    </dialog>
+</main>
+
+<footer>
+    <p>&copy; 2024 TurnosJB</p>
+</footer>
+<script src="js/pacientes.js"></script>
+</body>
+</html>

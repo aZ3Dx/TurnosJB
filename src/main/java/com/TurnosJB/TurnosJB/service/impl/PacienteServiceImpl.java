@@ -8,6 +8,7 @@ import com.TurnosJB.TurnosJB.service.IPacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ public class PacienteServiceImpl implements IPacienteService {
 
     @Override
     public Paciente guardar(Paciente paciente) {
+        paciente.setFechaAlta(LocalDate.now());
         return iPacienteRepository.save(paciente);
     }
 

@@ -11,6 +11,6 @@ INSERT INTO pacientes (nombre, apellido, dni, fecha_alta, domicilio_id) VALUES (
 INSERT INTO pacientes (nombre, apellido, dni, fecha_alta, domicilio_id) VALUES ('Piero', 'Castillo', '24681357', '2024-09-03', 4);
 
 -- Insertar odontólogos
-INSERT INTO odontologos (nombre, apellido, matricula) VALUES ('Diyisney', 'Martínez', '10001');
-INSERT INTO odontologos (nombre, apellido, matricula) VALUES ('David.', 'López', '10002');
-INSERT INTO odontologos (nombre, apellido, matricula) VALUES ('Dayana', 'Gómez', '10003')
+INSERT INTO odontologos (nombre, apellido, matricula) VALUES ('Omar', 'Martínez', '10001');
+INSERT INTO odontologos (nombre, apellido, matricula) VALUES ('Orley', 'López', '10002');
+INSERT INTO odontologos (nombre, apellido, matricula) VALUES ('Opal', 'Gómez', '10003')
