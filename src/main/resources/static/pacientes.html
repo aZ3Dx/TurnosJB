@@ -53,38 +53,40 @@
                 </tr>
                 </thead>
                 <tbody id="tbody-pacientes">
-                    <tr>
-                        <th scope="row">${paciente.id}</th>
-                        <td>${paciente.nombre}</td>
-                        <td>${paciente.apellido}</td>
-                        <td>${paciente.dni}</td>
-                        <td>${paciente.fechaAlta}</td>
-                        <td>${paciente.domicilio.calle}</td>
-                        <td>${paciente.domicilio.numero}</td>
-                        <td>${paciente.domicilio.localidad}</td>
-                        <td>${paciente.domicilio.provincia}</td>
-                        <td>
-                            <div style="display: flex">
-                                <button id="btn-editar" data-paciente-id="${paciente.id}" data-tooltip="Editar" class="outline">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                         stroke-linejoin="round" class="lucide lucide-square-pen">
-                                        <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                        <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
-                                    </svg>
-                                </button>
-                                <button id="btn-borrar" data-paciente-id="${paciente.id}" data-tooltip="Borrar" class="outline contrast">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                         stroke-linejoin="round" class="lucide lucide-trash">
-                                        <path d="M3 6h18"/>
-                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                <tr>
+                    <th scope="row">${paciente.id}</th>
+                    <td>${paciente.nombre}</td>
+                    <td>${paciente.apellido}</td>
+                    <td>${paciente.dni}</td>
+                    <td>${paciente.fechaAlta}</td>
+                    <td>${paciente.domicilio.calle}</td>
+                    <td>${paciente.domicilio.numero}</td>
+                    <td>${paciente.domicilio.localidad}</td>
+                    <td>${paciente.domicilio.provincia}</td>
+                    <td>
+                        <div style="display: flex">
+                            <button id="btn-editar" data-paciente-id="${paciente.id}" data-tooltip="Editar"
+                                    class="outline">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="lucide lucide-square-pen">
+                                    <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
+                                </svg>
+                            </button>
+                            <button id="btn-borrar" data-paciente-id="${paciente.id}" data-tooltip="Borrar"
+                                    class="outline contrast">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="lucide lucide-trash">
+                                    <path d="M3 6h18"/>
+                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -129,6 +131,49 @@
         </article>
     </dialog>
 
+    <!-- Modal para editar paciente -->
+    <dialog id="dialog-editar-paciente">
+        <article>
+            <header>
+                <button id="btn-close-form-editar-paciente" aria-label="Close" rel="prev"></button>
+                <p><strong>Agregar Paciente</strong></p>
+            </header>
+            <form id="form-editar-paciente">
+                <p>Datos paciente</p>
+                <input type="hidden" id="paciente-editar-id-hidden">
+                <fieldset role="group">
+                    <label for="nombre-editar" style="display: none">Nombre:</label>
+                    <input type="text" id="nombre-editar" name="nombre-editar" placeholder="Nombre">
+                    <label for="apellido-editar" style="display: none">Apellido:</label>
+                    <input type="text" id="apellido-editar" name="apellido-editar" placeholder="Apellido">
+                    <label for="dni-editar" style="display: none">DNI:</label>
+                    <input type="text" id="dni-editar" name="dni-editar" placeholder="DNI">
+                </fieldset>
+
+                <label for="fecha-alta-editar" style="display: none">Fecha Alta:</label>
+                <input type="date" id="fecha-alta-editar" name="fecha-alta-editar" disabled>
+
+                <p>Datos domicilio</p>
+                <fieldset role="group">
+                    <label for="domicilio-editar" style="display: none">Calle:</label>
+                    <input type="text" id="domicilio-editar" name="domicilio-editar" placeholder="Calle">
+                    <label for="numero-editar" style="display: none">Número:</label>
+                    <input type="number" id="numero-editar" name="numero-editar" placeholder="Número">
+                </fieldset>
+                <fieldset role="group">
+                    <label for="localidad-editar" style="display: none">Localidad:</label>
+                    <input type="text" id="localidad-editar" name="localidad-editar" placeholder="Localidad">
+                    <label for="provincia-editar" style="display: none">Provincia:</label>
+                    <input type="text" id="provincia-editar" name="provincia-editar" placeholder="Provincia">
+                </fieldset>
+            </form>
+            <footer>
+                <button id="btn-cancelar-form-editar-paciente" type="button" class="secondary">Cancelar</button>
+                <button id="btn-guardar-form-editar-paciente" type="button">Guardar</button>
+            </footer>
+        </article>
+    </dialog>
+
     <!-- Modal para borrar paciente -->
     <dialog id="dialog-borrar-paciente">
         <article>
@@ -145,11 +190,12 @@
                     <input type="text" id="paciente-borrar-id" name="paciente-borrar-id" disabled>
                     <label for="paciente-borrar-nombre" style="display: none">Nombre:</label>
                     <input type="text" id="paciente-borrar-nombre" name="paciente-borrar-nombre" disabled>
+                    <input type="hidden" id="paciente-borrar-id-hidden">
                 </fieldset>
             </form>
             <footer>
                 <button id="btn-cancelar-form-borrar-paciente" type="button" class="secondary">Cancelar</button>
-                <button id="btn-guardar-form-borrar-paciente" type="button" data-paciente-id="">Borrar</button>
+                <button id="btn-guardar-form-borrar-paciente" type="button">Borrar</button>
             </footer>
         </article>
     </dialog>

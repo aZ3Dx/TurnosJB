@@ -62,7 +62,29 @@ public class PacienteServiceImpl implements IPacienteService {
     }
 
     @Override
-    public Paciente actualizar(Paciente paciente) {
+    public Paciente actualizar(Paciente paciente) throws ConflictException, BadRequestException {
+        // Revisamos que si el nuevo DNI puede cambiar
+        Paciente pacienteConElMismoDni = iPacienteRepository.findByDni(paciente.getDni());
+        if (pacienteConElMismoDni != null && !pacienteConElMismoDni.getId().equals(paciente.getId())) {
+            throw new ConflictException("Ya existe un paciente con el dni " + paciente.getDni());
+        }
+        // Validamos que el DNI sea correcto
+        if (!paciente.getDni().matches("[0-9]+")) {
+            throw new BadRequestException("El DNI debe ser numérico");
+        }
+        // Revisamos que los campos de Paciente no estén vacíos
+        if (Optional.ofNullable(paciente.getNombre()).orElse("").isBlank() ||
+                Optional.ofNullable(paciente.getApellido()).orElse("").isBlank() ||
+                Optional.of(paciente.getDni()).orElse("").isBlank()) {
+            throw new BadRequestException("Los campos de Paciente no pueden estar vacíos");
+        }
+        // Revisamos los campos de su Domicilio
+        if (Optional.ofNullable(paciente.getDomicilio().getCalle()).orElse("").isBlank() ||
+                Optional.ofNullable(paciente.getDomicilio().getNumero()).orElse(0).equals(0) ||
+                Optional.ofNullable(paciente.getDomicilio().getLocalidad()).orElse("").isBlank() ||
+                Optional.ofNullable(paciente.getDomicilio().getProvincia()).orElse("").isBlank()) {
+            throw new BadRequestException("Las campos de domicilio no pueden estar vacíos");
+        }
         return iPacienteRepository.save(paciente);
     }
 

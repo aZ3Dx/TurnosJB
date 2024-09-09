@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     obtenerPacientes();
 });
 
+// Función para obtener los pacientes
 function obtenerPacientes() {
     fetch("/pacientes")
         .then(response => {
@@ -12,6 +13,19 @@ function obtenerPacientes() {
         })
         .then(data => {
             renderizarPacientes(data);
+        })
+        .catch(error => {
+            console.error("Hubo un problema con la petición fetch:", error);
+        });
+}
+// Función para obtener los datos de un paciente
+function obtenerPaciente(id) {
+    return fetch("/pacientes/" + id)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al obtener el paciente");
+            }
+            return response.json();
         })
         .catch(error => {
             console.error("Hubo un problema con la petición fetch:", error);
@@ -38,7 +52,7 @@ function renderizarPacientes(pacientes) {
             <td>${paciente.domicilio.provincia}</td>
             <td>
                 <div style="display: flex">
-                    <button id="btn-editar" data-paciente-id="${paciente.id}" data-tooltip="Editar" class="outline">
+                    <button data-paciente-id="${paciente.id}" data-tooltip="Editar" class="outline btn-editar">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                              stroke-linejoin="round" class="lucide lucide-square-pen">
@@ -46,7 +60,7 @@ function renderizarPacientes(pacientes) {
                             <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
                         </svg>
                     </button>
-                    <button id="btn-borrar" data-paciente-id="${paciente.id}" data-tooltip="Borrar" class="outline contrast">
+                    <button data-paciente-id="${paciente.id}" data-tooltip="Borrar" class="outline contrast btn-borrar">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                              stroke-linejoin="round" class="lucide lucide-trash">
@@ -61,20 +75,22 @@ function renderizarPacientes(pacientes) {
 
         pacientesList.appendChild(fila);
     });
+    funcionalidadBtnBorrar();
+    funcionalidadBtnEditar();
 }
 
 // Enviar formulario de agregar paciente
 document.getElementById("btn-guardar-form-agregar-paciente").addEventListener("click", function () {
     const form = document.getElementById("form-agregar-paciente");
     const paciente = {
-        nombre: document.getElementById("nombre").value,
-        apellido: document.getElementById("apellido").value,
-        dni: document.getElementById("dni").value,
+        nombre: form.elements["nombre"].value,
+        apellido: form.elements["apellido"].value,
+        dni: form.elements["dni"].value,
         domicilio: {
-            calle: document.getElementById("domicilio").value,
-            numero: document.getElementById("numero").value,
-            localidad: document.getElementById("localidad").value,
-            provincia: document.getElementById("provincia").value
+            calle: form.elements["domicilio"].value,
+            numero: form.elements["numero"].value,
+            localidad: form.elements["localidad"].value,
+            provincia: form.elements["provincia"].value
         }
     };
     fetch("/pacientes", {
@@ -94,6 +110,65 @@ document.getElementById("btn-guardar-form-agregar-paciente").addEventListener("c
                 obtenerPacientes();
                 // Cierra el modal
                 closeModalAnimation("dialog-agregar-paciente");
+            })
+            .catch(error => {
+                console.error("Hubo un problema con la petición fetch:", error);
+            });
+});
+// Enviar formulario de borrar paciente
+document.getElementById("btn-guardar-form-borrar-paciente").addEventListener("click", function () {
+    const form = document.getElementById("form-borrar-paciente");
+    const pacienteId = form.elements["paciente-borrar-id-hidden"].value;
+    fetch("/pacientes/" + pacienteId, {
+            method: "DELETE"
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error al borrar el paciente");
+                }
+            })
+            .then(data => {
+                obtenerPacientes();
+                // Cierra el modal
+                closeModalAnimation("dialog-borrar-paciente");
+            })
+            .catch(error => {
+                console.error("Hubo un problema con la petición fetch:", error);
+            });
+});
+// Enviar formulario de editar paciente
+document.getElementById("btn-guardar-form-editar-paciente").addEventListener("click", function () {
+    const form = document.getElementById("form-editar-paciente");
+    const paciente = {
+        id: form.elements["paciente-editar-id-hidden"].value,
+        nombre: form.elements["nombre-editar"].value,
+        apellido: form.elements["apellido-editar"].value,
+        dni: form.elements["dni-editar"].value,
+        fechaAlta: form.elements["fecha-alta-editar"].value,
+        domicilio: {
+            calle: form.elements["domicilio-editar"].value,
+            numero: form.elements["numero-editar"].value,
+            localidad: form.elements["localidad-editar"].value,
+            provincia: form.elements["provincia-editar"].value
+        }
+    };
+    fetch("/pacientes", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(paciente)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error al editar el paciente");
+                }
+                return response.json();
+            })
+            .then(data => {
+                obtenerPacientes();
+                // Cierra el modal
+                closeModalAnimation("dialog-editar-paciente");
             })
             .catch(error => {
                 console.error("Hubo un problema con la petición fetch:", error);
@@ -127,13 +202,52 @@ document.getElementById("btn-close-form-agregar-paciente").addEventListener("cli
 });
 
 // Abrir el modal de borrar paciente
-document.getElementById("btn-borrar").addEventListener("click", function () {
-    openModalAnimation("dialog-borrar-paciente");
-})
+function funcionalidadBtnBorrar() {
+    const btnsBorrar = document.getElementsByClassName("btn-borrar");
+    for (let btn of btnsBorrar) {
+        btn.addEventListener("click", function () {
+            openModalAnimation("dialog-borrar-paciente");
+            // Asignar el id del paciente al abrir el modal
+            const pacienteId = this.getAttribute("data-paciente-id");
+            document.getElementById("paciente-borrar-id-hidden").value = pacienteId;
+        });
+    }
+}
 // Cerrar o cancelar el modal de borrar paciente
 document.getElementById("btn-cancelar-form-borrar-paciente").addEventListener("click", function () {
     closeModalAnimation("dialog-borrar-paciente");
 });
 document.getElementById("btn-close-form-borrar-paciente").addEventListener("click", function () {
     closeModalAnimation("dialog-borrar-paciente");
+});
+
+// Abrir el modal de editar paciente
+function funcionalidadBtnEditar() {
+    const btnsEditar = document.getElementsByClassName("btn-editar");
+    for (let btn of btnsEditar) {
+        btn.addEventListener("click", function () {
+            openModalAnimation("dialog-editar-paciente");
+            // Asignar el id del paciente al abrir el modal
+            const pacienteId = this.getAttribute("data-paciente-id");
+            document.getElementById("paciente-editar-id-hidden").value = pacienteId;
+            // Cargar los datos del paciente
+            obtenerPaciente(pacienteId).then(paciente => {
+                document.getElementById("nombre-editar").value = paciente.nombre;
+                document.getElementById("apellido-editar").value = paciente.apellido;
+                document.getElementById("dni-editar").value = paciente.dni;
+                document.getElementById("fecha-alta-editar").value = paciente.fechaAlta;
+                document.getElementById("domicilio-editar").value = paciente.domicilio.calle;
+                document.getElementById("numero-editar").value = paciente.domicilio.numero;
+                document.getElementById("localidad-editar").value = paciente.domicilio.localidad;
+                document.getElementById("provincia-editar").value = paciente.domicilio.provincia;
+            });
+        });
+    }
+}
+// Cerrar o cancelar el modal de editar paciente
+document.getElementById("btn-cancelar-form-editar-paciente").addEventListener("click", function () {
+    closeModalAnimation("dialog-editar-paciente");
+});
+document.getElementById("btn-close-form-editar-paciente").addEventListener("click", function () {
+    closeModalAnimation("dialog-editar-paciente");
 });
