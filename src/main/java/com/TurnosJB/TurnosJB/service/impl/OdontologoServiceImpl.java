@@ -1,6 +1,7 @@
 package com.TurnosJB.TurnosJB.service.impl;
 
 import com.TurnosJB.TurnosJB.entity.Odontologo;
+import com.TurnosJB.TurnosJB.entity.Paciente;
 import com.TurnosJB.TurnosJB.exception.BadRequestException;
 import com.TurnosJB.TurnosJB.exception.ConflictException;
 import com.TurnosJB.TurnosJB.exception.ResourceNotFoundException;
@@ -50,6 +51,17 @@ public class OdontologoServiceImpl implements IOdontologoService {
 
     @Override
     public Odontologo actualizar(Odontologo odontologo) {
+        // Revisamos que si la nueva matrícula puede cambiar
+        Odontologo odontologoConLaMismaMatricula = odontologoRepository.findByMatricula(odontologo.getMatricula());
+        if (odontologoConLaMismaMatricula != null && !odontologoConLaMismaMatricula.getId().equals(odontologo.getId())) {
+            throw new ConflictException("Ya existe un odontologo con la matricula " + odontologo.getMatricula());
+        }
+        // Revisamos que los campos de Odontologo no estén vacíos
+        if (Optional.ofNullable(odontologo.getNombre()).orElse("").isBlank() ||
+                Optional.ofNullable(odontologo.getApellido()).orElse("").isBlank() ||
+                Optional.ofNullable(odontologo.getMatricula()).orElse("").isBlank()) {
+            throw new BadRequestException("Los campos de Odontologo no pueden estar vacíos");
+        }
         return odontologoRepository.save(odontologo);
     }
 
