@@ -15,4 +15,6 @@ public interface IPacienteService {
     Paciente actualizar(Paciente paciente);
 
     List<Paciente> listar();
+
+    Paciente buscarPorDni(String ced);
 }

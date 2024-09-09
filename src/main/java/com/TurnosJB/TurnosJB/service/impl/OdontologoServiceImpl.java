@@ -1,6 +1,8 @@
 package com.TurnosJB.TurnosJB.service.impl;
 
 import com.TurnosJB.TurnosJB.entity.Odontologo;
+import com.TurnosJB.TurnosJB.exception.BadRequestException;
+import com.TurnosJB.TurnosJB.exception.ConflictException;
 import com.TurnosJB.TurnosJB.exception.ResourceNotFoundException;
 import com.TurnosJB.TurnosJB.repository.IOdontologoRepository;
 import com.TurnosJB.TurnosJB.service.IOdontologoService;
@@ -17,7 +19,17 @@ public class OdontologoServiceImpl implements IOdontologoService {
     private IOdontologoRepository odontologoRepository;
 
     @Override
-    public Odontologo guardar(Odontologo odontologo) {
+    public Odontologo guardar(Odontologo odontologo) throws ConflictException, BadRequestException {
+        // Revisamos que no hayan odontologos con el mismo matricula
+        if (odontologoRepository.findByMatricula(odontologo.getMatricula()) != null) {
+            throw new ConflictException("Ya existe un odontologo con la matricula " + odontologo.getMatricula());
+        }
+        // Revisamos que los campos de Odontologo no estén vacíos
+        if (Optional.ofNullable(odontologo.getNombre()).orElse("").isBlank() ||
+                Optional.ofNullable(odontologo.getApellido()).orElse("").isBlank() ||
+                Optional.ofNullable(odontologo.getMatricula()).orElse("").isBlank()) {
+            throw new BadRequestException("Los campos de odontologo no pueden estar vacíos");
+        }
         return odontologoRepository.save(odontologo);
     }
 
@@ -44,5 +56,10 @@ public class OdontologoServiceImpl implements IOdontologoService {
     @Override
     public List<Odontologo> listar() {
         return odontologoRepository.findAll();
+    }
+
+    @Override
+    public Odontologo buscarPorMatricula(String matricula) {
+        return odontologoRepository.findByMatricula(matricula);
     }
 }

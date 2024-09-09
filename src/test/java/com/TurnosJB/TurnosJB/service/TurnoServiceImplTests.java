@@ -30,21 +30,30 @@ public class TurnoServiceImplTests {
     @Autowired
     private OdontologoServiceImpl odontologoService;
 
+    private Domicilio crearDomicilio() {
+        Domicilio domicilio = new Domicilio();
+        domicilio.setCalle("Calle 1");
+        domicilio.setNumero(123);
+        domicilio.setLocalidad("Loc1");
+        domicilio.setProvincia("Prov1");
+        return domicilio;
+    }
+
     private Paciente crearPaciente() {
         Paciente paciente = new Paciente();
         paciente.setNombre("Pablo");
         paciente.setApellido("Perez");
         paciente.setDni("12345678");
         paciente.setFechaAlta(LocalDate.now());
-        paciente.setDomicilio(new Domicilio());
-        return pacienteService.guardar(paciente);
+        paciente.setDomicilio(crearDomicilio());
+        return paciente;
     }
 
     private Odontologo crearOdontologo() {
         Odontologo odontologo = new Odontologo();
         odontologo.setNombre("Orales");
         odontologo.setApellido("Olas");
-        odontologo.setMatricula(1234);
+        odontologo.setMatricula("1234");
         return odontologoService.guardar(odontologo);
     }
 
@@ -53,6 +62,7 @@ public class TurnoServiceImplTests {
     public void testGuardarTurno() {
         // Arrange
         Paciente paciente = crearPaciente();
+        pacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
         Turno turno = new Turno();
         turno.setPaciente(paciente);
@@ -78,6 +88,7 @@ public class TurnoServiceImplTests {
     public void testBuscarTurnoPorId() {
         // Arrange
         Paciente paciente = crearPaciente();
+        pacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
         Turno turno = new Turno();
         turno.setPaciente(paciente);
@@ -100,9 +111,11 @@ public class TurnoServiceImplTests {
     }
 
     @Test
+    @Transactional
     public void testEliminarTurno() {
         // Arrange
         Paciente paciente = crearPaciente();
+        pacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
         Turno turno = new Turno();
         turno.setPaciente(paciente);
@@ -125,6 +138,7 @@ public class TurnoServiceImplTests {
     public void testActualizarTurno() {
         // Arrange
         Paciente paciente = crearPaciente();
+        pacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
         Turno turno = new Turno();
         turno.setPaciente(paciente);
@@ -146,7 +160,10 @@ public class TurnoServiceImplTests {
     public void testListarTurnos() {
         // Arrange
         Paciente paciente1 = crearPaciente();
+        pacienteService.guardar(paciente1);
         Paciente paciente2 = crearPaciente();
+        paciente2.setDni("87654321");
+        pacienteService.guardar(paciente2);
         Odontologo odontologo = crearOdontologo();
         Turno turno1 = new Turno();
         turno1.setPaciente(paciente1);
@@ -173,6 +190,7 @@ public class TurnoServiceImplTests {
     public void testListarTurnosPorPaciente() {
         // Arrange
         Paciente paciente = crearPaciente();
+        pacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
         Turno turno1 = new Turno();
         turno1.setPaciente(paciente);
@@ -199,6 +217,7 @@ public class TurnoServiceImplTests {
     public void testListarTurnosPorOdontologo() {
         // Arrange
         Paciente paciente = crearPaciente();
+        pacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
         Turno turno1 = new Turno();
         turno1.setPaciente(paciente);

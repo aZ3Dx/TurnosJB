@@ -19,13 +19,22 @@ public class PacienteServiceImplTests {
     @Autowired
     private PacienteServiceImpl pacienteService;
 
+    private Domicilio crearDomicilio() {
+        Domicilio domicilio = new Domicilio();
+        domicilio.setCalle("Calle 1");
+        domicilio.setNumero(123);
+        domicilio.setLocalidad("Loc1");
+        domicilio.setProvincia("Prov1");
+        return domicilio;
+    }
+
     private Paciente crearPaciente() {
         Paciente paciente = new Paciente();
         paciente.setNombre("Paco");
         paciente.setApellido("Peña");
         paciente.setDni("12345678");
         paciente.setFechaAlta(LocalDate.now());
-        paciente.setDomicilio(new Domicilio());
+        paciente.setDomicilio(crearDomicilio());
         return paciente;
     }
 
@@ -110,6 +119,7 @@ public class PacienteServiceImplTests {
         pacienteService.guardar(paciente1);
 
         Paciente paciente2 = crearPaciente();
+        paciente2.setDni("87654321");
         pacienteService.guardar(paciente2);
 
         // Act

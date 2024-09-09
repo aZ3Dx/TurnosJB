@@ -22,7 +22,7 @@ public class OdontologoServiceImplTests {
         Odontologo odontologo = new Odontologo();
         odontologo.setNombre("Omar");
         odontologo.setApellido("Peña");
-        odontologo.setMatricula(1234);
+        odontologo.setMatricula("1234");
         return odontologo;
     }
 
@@ -87,13 +87,13 @@ public class OdontologoServiceImplTests {
         Odontologo odontologoGuardado = odontologoService.guardar(odontologo);
 
         // Act
-        odontologoGuardado.setMatricula(4321);
+        odontologoGuardado.setMatricula("A321");
         odontologoService.actualizar(odontologoGuardado);
         Odontologo odontologoActualizado = odontologoService.buscarPorId(odontologoGuardado.getId());
 
         // Assert
         assertAll("Verificar odontologo actualizado",
-                () -> assertEquals(4321, odontologoActualizado.getMatricula())
+                () -> assertEquals("A321", odontologoActualizado.getMatricula())
         );
     }
 
@@ -102,8 +102,9 @@ public class OdontologoServiceImplTests {
     public void testListarOdontologos() {
         // Arrange
         Odontologo odontologo1 = crearOdontologo();
-        Odontologo odontologo2 = crearOdontologo();
         odontologoService.guardar(odontologo1);
+        Odontologo odontologo2 = crearOdontologo();
+        odontologo2.setMatricula("A321");
         odontologoService.guardar(odontologo2);
 
         // Act

@@ -2,6 +2,8 @@ package com.TurnosJB.TurnosJB.service.impl;
 
 import com.TurnosJB.TurnosJB.entity.Odontologo;
 import com.TurnosJB.TurnosJB.entity.Paciente;
+import com.TurnosJB.TurnosJB.exception.BadRequestException;
+import com.TurnosJB.TurnosJB.exception.ConflictException;
 import com.TurnosJB.TurnosJB.exception.ResourceNotFoundException;
 import com.TurnosJB.TurnosJB.repository.IPacienteRepository;
 import com.TurnosJB.TurnosJB.service.IPacienteService;
@@ -18,8 +20,29 @@ public class PacienteServiceImpl implements IPacienteService {
     private IPacienteRepository iPacienteRepository;
 
     @Override
-    public Paciente guardar(Paciente paciente) {
+    public Paciente guardar(Paciente paciente) throws ConflictException, BadRequestException {
         paciente.setFechaAlta(LocalDate.now());
+        // Revisamos que no hayan pacientes con el mismo dni
+        if (iPacienteRepository.findByDni(paciente.getDni()) != null) {
+            throw new ConflictException("Ya existe un paciente con el dni " + paciente.getDni());
+        }
+        // Validamos que el DNI sea correcto
+        if (!paciente.getDni().matches("[0-9]+")) {
+            throw new BadRequestException("El DNI debe ser numérico");
+        }
+        // Revisamos que los campos de Paciente no estén vacíos
+        if (Optional.ofNullable(paciente.getNombre()).orElse("").isBlank() ||
+                Optional.ofNullable(paciente.getApellido()).orElse("").isBlank() ||
+                Optional.of(paciente.getDni()).orElse("").isBlank()) {
+            throw new BadRequestException("Los campos de Paciente no pueden estar vacíos");
+        }
+        // Revisamos los campos de su Domicilio
+        if (Optional.ofNullable(paciente.getDomicilio().getCalle()).orElse("").isBlank() ||
+                Optional.ofNullable(paciente.getDomicilio().getNumero()).orElse(0).equals(0) ||
+                Optional.ofNullable(paciente.getDomicilio().getLocalidad()).orElse("").isBlank() ||
+                Optional.ofNullable(paciente.getDomicilio().getProvincia()).orElse("").isBlank()) {
+            throw new BadRequestException("Las campos de domicilio no pueden estar vacíos");
+        }
         return iPacienteRepository.save(paciente);
     }
 
@@ -46,5 +69,10 @@ public class PacienteServiceImpl implements IPacienteService {
     @Override
     public List<Paciente> listar() {
         return iPacienteRepository.findAll();
+    }
+
+    @Override
+    public Paciente buscarPorDni(String dni) {
+        return iPacienteRepository.findByDni(dni);
     }
 }
