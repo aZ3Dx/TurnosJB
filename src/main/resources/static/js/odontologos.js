@@ -192,6 +192,11 @@ function funcionalidadBtnBorrar() {
             // Asignar el id del odontologo al abrir el modal
             const odontologoId = this.getAttribute("data-odontologo-id");
             document.getElementById("odontologo-borrar-id-hidden").value = odontologoId;
+            // Cargar los datos del odontologo
+            obtenerOdontologo(odontologoId).then(odontologo => {
+                document.getElementById("odontologo-borrar-id").value = odontologo.id;
+                document.getElementById("odontologo-borrar-nombre").value = odontologo.nombre + " " + odontologo.apellido;
+            });
         });
     }
 }

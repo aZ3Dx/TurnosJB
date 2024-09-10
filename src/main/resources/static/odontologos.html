@@ -18,6 +18,11 @@
             <li><a href="pacientes.html">Pacientes</a></li>
             <li><a href="odontologos.html" aria-current="page">Odontólogos</a></li>
             <li><a href="turnos.html">Turnos</a></li>
+            <li>
+                <button id="theme-toggle" aria-label="Toggle Theme" class="outline secondary">
+                    Cambiar Tema
+                </button>
+            </li>
         </ul>
     </nav>
 </header>
@@ -110,7 +115,7 @@
         <article>
             <header>
                 <button id="btn-close-form-editar-odontologo" aria-label="Close" rel="prev"></button>
-                <p><strong>Agregar Odontólogo</strong></p>
+                <p><strong>Editar Odontólogo</strong></p>
             </header>
             <form id="form-editar-odontologo">
                 <p>Datos odontólogo</p>
@@ -140,7 +145,7 @@
                 ¿Seguro que quieres borrar este odontólogo?
             </p>
             <form id="form-borrar-odontologo">
-                <fieldset role="group">
+                <fieldset class="grid">
                     <label for="odontologo-borrar-id" style="display: none">Id:</label>
                     <input type="text" id="odontologo-borrar-id" name="odontologo-borrar-id" disabled>
                     <label for="odontologo-borrar-nombre" style="display: none">Nombre:</label>
@@ -160,5 +165,6 @@
     <p>&copy; 2024 TurnosJB</p>
 </footer>
 <script src="js/odontologos.js"></script>
+<script src="js/cambiar-tema.js"></script>
 </body>
 </html>

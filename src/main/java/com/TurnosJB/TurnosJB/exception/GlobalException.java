@@ -21,4 +21,9 @@ public class GlobalException {
     public ResponseEntity<String> processConflictException(ConflictException exception){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
     }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> processDataIntegrityViolationException(DataIntegrityViolationException exception){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+    }
 }

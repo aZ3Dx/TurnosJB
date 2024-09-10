@@ -3,6 +3,7 @@ package com.TurnosJB.TurnosJB.service.impl;
 import com.TurnosJB.TurnosJB.entity.Paciente;
 import com.TurnosJB.TurnosJB.entity.Turno;
 import com.TurnosJB.TurnosJB.exception.BadRequestException;
+import com.TurnosJB.TurnosJB.exception.ConflictException;
 import com.TurnosJB.TurnosJB.exception.ResourceNotFoundException;
 import com.TurnosJB.TurnosJB.repository.IOdontologoRepository;
 import com.TurnosJB.TurnosJB.repository.IPacienteRepository;
@@ -11,7 +12,10 @@ import com.TurnosJB.TurnosJB.service.ITurnoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -20,7 +24,6 @@ public class TurnoServiceImpl implements ITurnoService {
     @Autowired
     private ITurnoRepository iTurnoRepository;
 
-
     @Autowired
     private IPacienteRepository iPacienteRepository;
 
@@ -28,17 +31,45 @@ public class TurnoServiceImpl implements ITurnoService {
     private IOdontologoRepository iOdontologoRepository;
 
     @Override
-    public Turno guardar(Turno turno) throws BadRequestException {
+    public Turno guardar(Turno turno) throws BadRequestException, ConflictException {
         if (turno.getPaciente() == null || turno.getOdontologo() == null) {
             throw new BadRequestException("Los datos del turno no pueden ser nulos.");
         }
 
         if ((turno.getPaciente().getId() == null) || !iPacienteRepository.existsById(turno.getPaciente().getId())) {
-            throw new BadRequestException("El paciente con ID " + turno.getPaciente().getId() + " no existe.");
+            throw new BadRequestException("No se puede registrar el turno si el paciente con ID " + turno.getPaciente().getId() + " no existe.");
         }
 
         if ((turno.getOdontologo().getId() == null) || !iOdontologoRepository.existsById(turno.getOdontologo().getId())) {
-            throw new BadRequestException("El odontólogo con ID " + turno.getOdontologo().getId() + " no existe.");
+            throw new BadRequestException("No se puede registrar el turno si el odontólogo con ID " + turno.getOdontologo().getId() + " no existe.");
+        }
+
+        // Validamos los campos de Turno
+        if (turno.getFecha() == null || turno.getHora() == null) {
+            throw new BadRequestException("Los campos de Turno no pueden ser nulos.");
+        }
+
+        // Validamos que la fecha y hora sea posterior a la fecha actual
+        if (turno.getFecha().isBefore(LocalDate.now())) {
+            throw new BadRequestException("La fecha del turno no puede ser anterior a la fecha actual.");
+        }
+        if (turno.getFecha().isEqual(LocalDate.now()) && turno.getHora().isBefore(LocalTime.now())) {
+            throw new BadRequestException("La hora del turno no puede ser anterior a la hora actual.");
+        }
+
+        // Validamos que el paciente no tenga un turno en esa fecha y hora
+        List<Turno> turnosDelPaciente = iTurnoRepository.findByPacienteId(turno.getPaciente().getId());
+        for (Turno t : turnosDelPaciente) {
+            if (t.getFecha().isEqual(turno.getFecha()) && t.getHora().equals(turno.getHora())) {
+                throw new ConflictException("El paciente ya tiene un turno en esa fecha y hora.");
+            }
+        }
+        // Validamos que el odontólogo no tenga un turno en esa fecha y hora
+        List<Turno> turnosDelOdontologo = iTurnoRepository.findByOdontologoId(turno.getOdontologo().getId());
+        for (Turno t : turnosDelOdontologo) {
+            if (t.getFecha().isEqual(turno.getFecha()) && t.getHora().equals(turno.getHora())) {
+                throw new ConflictException("El odontólogo ya tiene un turno en esa fecha y hora.");
+            }
         }
 
         return iTurnoRepository.save(turno);
@@ -60,7 +91,59 @@ public class TurnoServiceImpl implements ITurnoService {
     }
 
     @Override
-    public Turno actualizar(Turno turno) {
+    public Turno actualizar(Turno turno) throws BadRequestException, ConflictException {
+        Turno turnoAnterior = iTurnoRepository.findById(turno.getId()).orElse(null);
+        if (turnoAnterior == null) {
+            throw new BadRequestException("No se puede actualizar el turno si no existe.");
+        }
+        if (turnoAnterior.getFecha().isEqual(turno.getFecha()) &&
+                turnoAnterior.getHora().equals(turno.getHora()) &&
+                turnoAnterior.getPaciente().getId().equals(turno.getPaciente().getId()) &&
+                turnoAnterior.getOdontologo().getId().equals(turno.getOdontologo().getId())) {
+            return turnoAnterior;
+        }
+
+        if (turno.getPaciente() == null || turno.getOdontologo() == null) {
+            throw new BadRequestException("Los datos del turno no pueden ser nulos.");
+        }
+
+        if ((turno.getPaciente().getId() == null) || !iPacienteRepository.existsById(turno.getPaciente().getId())) {
+            throw new BadRequestException("El paciente con ID " + turno.getPaciente().getId() + " no existe.");
+        }
+
+        if ((turno.getOdontologo().getId() == null) || !iOdontologoRepository.existsById(turno.getOdontologo().getId())) {
+            throw new BadRequestException("El odontólogo con ID " + turno.getOdontologo().getId() + " no existe.");
+        }
+
+        // Validamos los campos de Turno
+        if (turno.getFecha() == null || turno.getHora() == null) {
+            throw new BadRequestException("Los campos de Turno no pueden ser nulos.");
+        }
+
+        // Validamos que la fecha y hora sea posterior a la fecha actual
+        if (turno.getFecha().isBefore(LocalDate.now())) {
+            throw new BadRequestException("La fecha del turno no puede ser anterior a la fecha actual.");
+        }
+        if (turno.getFecha().isEqual(LocalDate.now()) && turno.getHora().isBefore(LocalTime.now())) {
+            throw new BadRequestException("La hora del turno no puede ser anterior a la hora actual.");
+        }
+
+        // Validamos que el paciente no tenga un turno en esa fecha y hora
+        List<Turno> turnosDelPaciente = iTurnoRepository.findByPacienteId(turno.getPaciente().getId());
+        for (Turno t : turnosDelPaciente) {
+            if (t.getFecha().isEqual(turno.getFecha()) && t.getHora().equals(turno.getHora())) {
+                throw new ConflictException("El paciente ya tiene un turno en esa fecha y hora.");
+            }
+        }
+
+        // Validamos que el odontólogo no tenga un turno en esa fecha y hora
+        List<Turno> turnosDelOdontologo = iTurnoRepository.findByOdontologoId(turno.getOdontologo().getId());
+        for (Turno t : turnosDelOdontologo) {
+            if (t.getFecha().isEqual(turno.getFecha()) && t.getHora().equals(turno.getHora())) {
+                throw new ConflictException("El odontólogo ya tiene un turno en esa fecha y hora.");
+            }
+        }
+
         return iTurnoRepository.save(turno);
     }
 

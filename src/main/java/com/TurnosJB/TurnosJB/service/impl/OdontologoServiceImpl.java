@@ -1,11 +1,12 @@
 package com.TurnosJB.TurnosJB.service.impl;
 
 import com.TurnosJB.TurnosJB.entity.Odontologo;
-import com.TurnosJB.TurnosJB.entity.Paciente;
 import com.TurnosJB.TurnosJB.exception.BadRequestException;
 import com.TurnosJB.TurnosJB.exception.ConflictException;
+import com.TurnosJB.TurnosJB.exception.DataIntegrityViolationException;
 import com.TurnosJB.TurnosJB.exception.ResourceNotFoundException;
 import com.TurnosJB.TurnosJB.repository.IOdontologoRepository;
+import com.TurnosJB.TurnosJB.repository.ITurnoRepository;
 import com.TurnosJB.TurnosJB.service.IOdontologoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,12 +18,15 @@ import java.util.Optional;
 public class OdontologoServiceImpl implements IOdontologoService {
 
     @Autowired
-    private IOdontologoRepository odontologoRepository;
+    private IOdontologoRepository iOdontologoRepository;
+
+    @Autowired
+    private ITurnoRepository iTurnoRepository;
 
     @Override
     public Odontologo guardar(Odontologo odontologo) throws ConflictException, BadRequestException {
         // Revisamos que no hayan odontologos con el mismo matricula
-        if (odontologoRepository.findByMatricula(odontologo.getMatricula()) != null) {
+        if (iOdontologoRepository.findByMatricula(odontologo.getMatricula()) != null) {
             throw new ConflictException("Ya existe un odontologo con la matricula " + odontologo.getMatricula());
         }
         // Revisamos que los campos de Odontologo no estén vacíos
@@ -31,12 +35,12 @@ public class OdontologoServiceImpl implements IOdontologoService {
                 Optional.ofNullable(odontologo.getMatricula()).orElse("").isBlank()) {
             throw new BadRequestException("Los campos de odontologo no pueden estar vacíos");
         }
-        return odontologoRepository.save(odontologo);
+        return iOdontologoRepository.save(odontologo);
     }
 
     @Override
     public Odontologo buscarPorId(Long id) throws ResourceNotFoundException {
-        Optional<Odontologo> odontologo = odontologoRepository.findById(id);
+        Optional<Odontologo> odontologo = iOdontologoRepository.findById(id);
         if (odontologo.isPresent()) {
             return odontologo.get();
         } else {
@@ -45,14 +49,18 @@ public class OdontologoServiceImpl implements IOdontologoService {
     }
 
     @Override
-    public void eliminar(Long id) {
-        odontologoRepository.deleteById(id);
+    public void eliminar(Long id) throws DataIntegrityViolationException {
+        // Revisamos que el odontologo no tenga turnos asociados
+        if (!iTurnoRepository.findByOdontologoId(id).isEmpty()) {
+            throw new DataIntegrityViolationException("El odontologo no puede ser eliminado porque tiene turnos asociados");
+        }
+        iOdontologoRepository.deleteById(id);
     }
 
     @Override
     public Odontologo actualizar(Odontologo odontologo) {
         // Revisamos que si la nueva matrícula puede cambiar
-        Odontologo odontologoConLaMismaMatricula = odontologoRepository.findByMatricula(odontologo.getMatricula());
+        Odontologo odontologoConLaMismaMatricula = iOdontologoRepository.findByMatricula(odontologo.getMatricula());
         if (odontologoConLaMismaMatricula != null && !odontologoConLaMismaMatricula.getId().equals(odontologo.getId())) {
             throw new ConflictException("Ya existe un odontologo con la matricula " + odontologo.getMatricula());
         }
@@ -62,16 +70,16 @@ public class OdontologoServiceImpl implements IOdontologoService {
                 Optional.ofNullable(odontologo.getMatricula()).orElse("").isBlank()) {
             throw new BadRequestException("Los campos de Odontologo no pueden estar vacíos");
         }
-        return odontologoRepository.save(odontologo);
+        return iOdontologoRepository.save(odontologo);
     }
 
     @Override
     public List<Odontologo> listar() {
-        return odontologoRepository.findAll();
+        return iOdontologoRepository.findAll();
     }
 
     @Override
     public Odontologo buscarPorMatricula(String matricula) {
-        return odontologoRepository.findByMatricula(matricula);
+        return iOdontologoRepository.findByMatricula(matricula);
     }
 }

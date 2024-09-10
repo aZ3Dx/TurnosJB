@@ -13,4 +13,10 @@ INSERT INTO pacientes (nombre, apellido, dni, fecha_alta, domicilio_id) VALUES (
 -- Insertar odontólogos
 INSERT INTO odontologos (nombre, apellido, matricula) VALUES ('Omar', 'Martínez', '10001');
 INSERT INTO odontologos (nombre, apellido, matricula) VALUES ('Orley', 'López', '10002');
-INSERT INTO odontologos (nombre, apellido, matricula) VALUES ('Opal', 'Gómez', '10003')
+INSERT INTO odontologos (nombre, apellido, matricula) VALUES ('Opal', 'Gómez', '10003');
+
+-- Insertar turnos
+INSERT INTO turnos (paciente_id, odontologo_id, fecha, hora) VALUES (1, 1, '2024-09-01', '10:00:00');
+INSERT INTO turnos (paciente_id, odontologo_id, fecha, hora) VALUES (2, 2, '2024-09-02', '11:00:00');
+INSERT INTO turnos (paciente_id, odontologo_id, fecha, hora) VALUES (3, 3, '2024-09-02', '12:00:00');
+INSERT INTO turnos (paciente_id, odontologo_id, fecha, hora) VALUES (4, 1, '2024-09-03', '13:00:00');

@@ -210,6 +210,11 @@ function funcionalidadBtnBorrar() {
             // Asignar el id del paciente al abrir el modal
             const pacienteId = this.getAttribute("data-paciente-id");
             document.getElementById("paciente-borrar-id-hidden").value = pacienteId;
+            // Cargar los datos del paciente
+            obtenerPaciente(pacienteId).then(paciente => {
+                document.getElementById("paciente-borrar-id").value = paciente.id;
+                document.getElementById("paciente-borrar-nombre").value = paciente.nombre + " " + paciente.apellido;
+            });
         });
     }
 }

@@ -2,10 +2,13 @@ package com.TurnosJB.TurnosJB.service.impl;
 
 import com.TurnosJB.TurnosJB.entity.Odontologo;
 import com.TurnosJB.TurnosJB.entity.Paciente;
+import com.TurnosJB.TurnosJB.entity.Turno;
 import com.TurnosJB.TurnosJB.exception.BadRequestException;
 import com.TurnosJB.TurnosJB.exception.ConflictException;
+import com.TurnosJB.TurnosJB.exception.DataIntegrityViolationException;
 import com.TurnosJB.TurnosJB.exception.ResourceNotFoundException;
 import com.TurnosJB.TurnosJB.repository.IPacienteRepository;
+import com.TurnosJB.TurnosJB.repository.ITurnoRepository;
 import com.TurnosJB.TurnosJB.service.IPacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,9 @@ import java.util.Optional;
 public class PacienteServiceImpl implements IPacienteService {
     @Autowired
     private IPacienteRepository iPacienteRepository;
+
+    @Autowired
+    private ITurnoRepository iTurnoRepository;
 
     @Override
     public Paciente guardar(Paciente paciente) throws ConflictException, BadRequestException {
@@ -38,10 +44,13 @@ public class PacienteServiceImpl implements IPacienteService {
         }
         // Revisamos los campos de su Domicilio
         if (Optional.ofNullable(paciente.getDomicilio().getCalle()).orElse("").isBlank() ||
-                Optional.ofNullable(paciente.getDomicilio().getNumero()).orElse(0).equals(0) ||
                 Optional.ofNullable(paciente.getDomicilio().getLocalidad()).orElse("").isBlank() ||
                 Optional.ofNullable(paciente.getDomicilio().getProvincia()).orElse("").isBlank()) {
             throw new BadRequestException("Las campos de domicilio no pueden estar vacíos");
+        }
+        // Revisamos el número de su Domicilio
+        if (Optional.ofNullable(paciente.getDomicilio().getNumero()).orElse(0).equals(0)) {
+            throw new BadRequestException("El campo de domicilio debe ser numérico");
         }
         return iPacienteRepository.save(paciente);
     }
@@ -57,7 +66,11 @@ public class PacienteServiceImpl implements IPacienteService {
     }
 
     @Override
-    public void eliminar(Long id) {
+    public void eliminar(Long id) throws DataIntegrityViolationException {
+        // Revisamos que el paciente no tenga turnos
+        if (!iTurnoRepository.findByPacienteId(id).isEmpty()) {
+            throw new DataIntegrityViolationException("No se puede eliminar el paciente porque tiene turnos asociados.");
+        }
         iPacienteRepository.deleteById(id);
     }
 
@@ -80,10 +93,13 @@ public class PacienteServiceImpl implements IPacienteService {
         }
         // Revisamos los campos de su Domicilio
         if (Optional.ofNullable(paciente.getDomicilio().getCalle()).orElse("").isBlank() ||
-                Optional.ofNullable(paciente.getDomicilio().getNumero()).orElse(0).equals(0) ||
                 Optional.ofNullable(paciente.getDomicilio().getLocalidad()).orElse("").isBlank() ||
                 Optional.ofNullable(paciente.getDomicilio().getProvincia()).orElse("").isBlank()) {
             throw new BadRequestException("Las campos de domicilio no pueden estar vacíos");
+        }
+        // Revisamos el número de su Domicilio
+        if (Optional.ofNullable(paciente.getDomicilio().getNumero()).orElse(0).equals(0)) {
+            throw new BadRequestException("El campo de domicilio debe ser numérico");
         }
         return iPacienteRepository.save(paciente);
     }
