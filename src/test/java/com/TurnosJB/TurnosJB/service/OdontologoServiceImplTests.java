@@ -114,4 +114,21 @@ public class OdontologoServiceImplTests {
         assertEquals(2, odontologos.size());
     }
 
+    @Test
+    @Transactional
+    public void testBuscarOdontologoPorMatricula() {
+        // Arrange
+        Odontologo odontologo = crearOdontologo();
+        odontologoService.guardar(odontologo);
+
+        // Act
+        Odontologo odontologoBuscado = odontologoService.buscarPorMatricula(odontologo.getMatricula());
+
+        // Assert
+        assertAll("Verificar odontologo buscado",
+                () -> assertNotNull(odontologoBuscado),
+                () -> assertEquals(odontologo.getMatricula(), odontologoBuscado.getMatricula())
+        );
+    }
+
 }

@@ -17,11 +17,14 @@ import java.util.Optional;
 @Service
 public class OdontologoServiceImpl implements IOdontologoService {
 
-    @Autowired
-    private IOdontologoRepository iOdontologoRepository;
+    private final IOdontologoRepository iOdontologoRepository;
+    private final ITurnoRepository iTurnoRepository;
 
     @Autowired
-    private ITurnoRepository iTurnoRepository;
+    public OdontologoServiceImpl(IOdontologoRepository iOdontologoRepository, ITurnoRepository iTurnoRepository) {
+        this.iOdontologoRepository = iOdontologoRepository;
+        this.iTurnoRepository = iTurnoRepository;
+    }
 
     @Override
     public Odontologo guardar(Odontologo odontologo) throws ConflictException, BadRequestException {

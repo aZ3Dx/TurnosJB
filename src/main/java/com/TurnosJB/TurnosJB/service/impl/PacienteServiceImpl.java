@@ -1,8 +1,6 @@
 package com.TurnosJB.TurnosJB.service.impl;
 
-import com.TurnosJB.TurnosJB.entity.Odontologo;
 import com.TurnosJB.TurnosJB.entity.Paciente;
-import com.TurnosJB.TurnosJB.entity.Turno;
 import com.TurnosJB.TurnosJB.exception.BadRequestException;
 import com.TurnosJB.TurnosJB.exception.ConflictException;
 import com.TurnosJB.TurnosJB.exception.DataIntegrityViolationException;
@@ -19,11 +17,15 @@ import java.util.Optional;
 
 @Service
 public class PacienteServiceImpl implements IPacienteService {
-    @Autowired
-    private IPacienteRepository iPacienteRepository;
+
+    private final IPacienteRepository iPacienteRepository;
+    private final ITurnoRepository iTurnoRepository;
 
     @Autowired
-    private ITurnoRepository iTurnoRepository;
+    public PacienteServiceImpl(IPacienteRepository iPacienteRepository, ITurnoRepository iTurnoRepository) {
+        this.iPacienteRepository = iPacienteRepository;
+        this.iTurnoRepository = iTurnoRepository;
+    }
 
     @Override
     public Paciente guardar(Paciente paciente) throws ConflictException, BadRequestException {

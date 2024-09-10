@@ -1,6 +1,5 @@
 package com.TurnosJB.TurnosJB.service.impl;
 
-import com.TurnosJB.TurnosJB.entity.Paciente;
 import com.TurnosJB.TurnosJB.entity.Turno;
 import com.TurnosJB.TurnosJB.exception.BadRequestException;
 import com.TurnosJB.TurnosJB.exception.ConflictException;
@@ -15,20 +14,21 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class TurnoServiceImpl implements ITurnoService {
 
-    @Autowired
-    private ITurnoRepository iTurnoRepository;
+    private final ITurnoRepository iTurnoRepository;
+    private final IPacienteRepository iPacienteRepository;
+    private final IOdontologoRepository iOdontologoRepository;
 
     @Autowired
-    private IPacienteRepository iPacienteRepository;
-
-    @Autowired
-    private IOdontologoRepository iOdontologoRepository;
+    public TurnoServiceImpl(ITurnoRepository iTurnoRepository, IPacienteRepository iPacienteRepository, IOdontologoRepository iOdontologoRepository) {
+        this.iTurnoRepository = iTurnoRepository;
+        this.iPacienteRepository = iPacienteRepository;
+        this.iOdontologoRepository = iOdontologoRepository;
+    }
 
     @Override
     public Turno guardar(Turno turno) throws BadRequestException, ConflictException {

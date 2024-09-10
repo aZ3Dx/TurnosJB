@@ -128,4 +128,18 @@ public class PacienteServiceImplTests {
         // Assert
         assertEquals(2, pacientes.size());
     }
+
+    @Test
+    @Transactional
+    public void testBuscarPacientePorDni() {
+        // Arrange
+        Paciente paciente = crearPaciente();
+        pacienteService.guardar(paciente);
+
+        // Act
+        Paciente pacienteBuscado = pacienteService.buscarPorDni(paciente.getDni());
+
+        // Assert
+        assertEquals(paciente, pacienteBuscado);
+    }
 }
