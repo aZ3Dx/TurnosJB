@@ -30,8 +30,8 @@ public class PacienteControllerTests {
 
     @BeforeEach
     public void setUp() {
-        Paciente paciente1 = new Paciente(1L, "Juan", "Perez", "123456", LocalDate.now(), new Domicilio(1L, "Calle 1", 1, "Localidad 1", "Provincia 1"));
-        Paciente paciente2 = new Paciente(2L, "Pedro", "Gonzalez", "234567", LocalDate.now(), new Domicilio(2L, "Calle 2", 2, "Localidad 2", "Provincia 2"));
+        Paciente paciente1 = new Paciente(1L, "Juan", "Perez", "123456", LocalDate.of(2024, 1, 1), new Domicilio(1L, "Calle 1", 1, "Localidad 1", "Provincia 1"));
+        Paciente paciente2 = new Paciente(2L, "Pedro", "Gonzalez", "234567", LocalDate.of(2024, 2, 2), new Domicilio(2L, "Calle 2", 2, "Localidad 2", "Provincia 2"));
         List<Paciente> pacientes = Arrays.asList(paciente1, paciente2);
         given(iPacienteService.listar()).willReturn(pacientes);
         given(iPacienteService.buscarPorId(1L)).willReturn(paciente1);
@@ -53,16 +53,16 @@ public class PacienteControllerTests {
         mvc.perform(get("/pacientes/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-09-10\"}"));
+                .andExpect(content().json("{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-01-01\"}"));
     }
 
     @Test
     public void testActualizarPaciente() throws Exception {
         mvc.perform(put("/pacientes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-09-10\"}"))
+                        .content("{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-01-01\"}"))
                 .andExpect(status().isCreated())
-                .andExpect(content().json("{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-09-10\"}"));
+                .andExpect(content().json("{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-01-01\"}"));
     }
 
     @Test
@@ -76,9 +76,9 @@ public class PacienteControllerTests {
     public void testGuardarPaciente() throws Exception {
         mvc.perform(post("/pacientes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-09-10\"}"))
+                        .content("{\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-01-01\"}"))
                 .andExpect(status().isCreated())
-                .andExpect(content().json("{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-09-10\"}"));
+                .andExpect(content().json("{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-01-01\"}"));
     }
 
 }
