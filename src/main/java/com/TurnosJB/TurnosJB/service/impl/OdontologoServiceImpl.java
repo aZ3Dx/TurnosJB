@@ -22,7 +22,6 @@ public class OdontologoServiceImpl implements IOdontologoService {
     private final IOdontologoRepository iOdontologoRepository;
     private final ITurnoRepository iTurnoRepository;
 
-    // Importar el logger
     private static final Logger LOGGER = LogManager.getLogger(OdontologoServiceImpl.class);
 
     @Autowired

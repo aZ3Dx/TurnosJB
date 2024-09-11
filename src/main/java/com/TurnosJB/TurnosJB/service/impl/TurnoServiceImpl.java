@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 @Service
 public class TurnoServiceImpl implements ITurnoService {
@@ -22,6 +24,8 @@ public class TurnoServiceImpl implements ITurnoService {
     private final ITurnoRepository iTurnoRepository;
     private final IPacienteRepository iPacienteRepository;
     private final IOdontologoRepository iOdontologoRepository;
+
+    private static final Logger LOGGER = LogManager.getLogger(TurnoServiceImpl.class);
 
     @Autowired
     public TurnoServiceImpl(ITurnoRepository iTurnoRepository, IPacienteRepository iPacienteRepository, IOdontologoRepository iOdontologoRepository) {
@@ -32,6 +36,8 @@ public class TurnoServiceImpl implements ITurnoService {
 
     @Override
     public Turno guardar(Turno turno) throws BadRequestException, ConflictException {
+        LOGGER.info("Comenzamos a persistir un turno");
+
         if (turno.getPaciente() == null || turno.getOdontologo() == null) {
             throw new BadRequestException("Los datos del turno no pueden ser nulos.");
         }
@@ -149,16 +155,19 @@ public class TurnoServiceImpl implements ITurnoService {
 
     @Override
     public List<Turno> listar() {
+        LOGGER.info("Lista de todos los turnos");
         return iTurnoRepository.findAll();
     }
 
     @Override
     public List<Turno> obtenerTurnosPorPaciente(Long id) {
+        LOGGER.info("Se busca el turno por paciente " + id);
         return iTurnoRepository.findByPacienteId(id);
     }
 
     @Override
     public List<Turno> obtenerTurnosPorOdontologo(Long id) {
+        LOGGER.info("Se busca el turno por odontologo "+ id);
         return iTurnoRepository.findByOdontologoId(id);
     }
 }
