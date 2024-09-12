@@ -1,6 +1,7 @@
 package com.TurnosJB.TurnosJB.service;
 
 import com.TurnosJB.TurnosJB.entity.Odontologo;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,9 @@ public class OdontologoServiceTests {
     @Autowired
     private IOdontologoService iOdontologoService;
 
+    @Autowired
+    private EntityManager entityManager;
+
     private Odontologo crearOdontologo() {
         Odontologo odontologo = new Odontologo();
         odontologo.setNombre("Omar");
@@ -35,10 +39,14 @@ public class OdontologoServiceTests {
         Odontologo odontologo = crearOdontologo();
 
         // Act
-        Odontologo savedOdontologo = iOdontologoService.guardar(odontologo);
+        Odontologo odontologoGuardado = iOdontologoService.guardar(crearOdontologo());
 
         // Assert
-        assertEquals(odontologo.getNombre(), savedOdontologo.getNombre());
+        assertAll(
+                () -> assertEquals(odontologo.getNombre(), odontologoGuardado.getNombre()),
+                () -> assertEquals(odontologo.getApellido(), odontologoGuardado.getApellido()),
+                () -> assertEquals(odontologo.getMatricula(), odontologoGuardado.getMatricula())
+        );
     }
 
     @DisplayName("Buscar odontologo por id")
@@ -48,12 +56,14 @@ public class OdontologoServiceTests {
         // Arrange
         Odontologo odontologo = crearOdontologo();
         Odontologo odontologoGuardado = iOdontologoService.guardar(odontologo);
+        entityManager.detach(odontologoGuardado);
 
         // Act
-        Odontologo odontologoBuscado = iOdontologoService.buscarPorId(odontologo.getId());
+        Odontologo odontologoBuscado = iOdontologoService.buscarPorId(odontologoGuardado.getId());
+        entityManager.detach(odontologoBuscado);
 
         // Assert
-        assertEquals(odontologoGuardado.getId(), odontologoBuscado.getId());
+        assertEquals(odontologoGuardado, odontologoBuscado);
     }
 
     @DisplayName("Eliminar odontologo")
@@ -62,6 +72,7 @@ public class OdontologoServiceTests {
         // Arrange
         Odontologo odontologo = crearOdontologo();
         Odontologo odontologoGuardado = iOdontologoService.guardar(odontologo);
+        entityManager.detach(odontologoGuardado);
         int cantidadOdontologosAntes = iOdontologoService.listar().size();
 
         // Act
@@ -79,14 +90,20 @@ public class OdontologoServiceTests {
         // Arrange
         Odontologo odontologo = crearOdontologo();
         Odontologo odontologoGuardado = iOdontologoService.guardar(odontologo);
+        entityManager.detach(odontologoGuardado);
 
         // Act
-        odontologoGuardado.setMatricula("A321");
-        iOdontologoService.actualizar(odontologoGuardado);
-        Odontologo odontologoActualizado = iOdontologoService.buscarPorId(odontologoGuardado.getId());
+        Odontologo odontologoAActualizar = new Odontologo();
+        odontologoAActualizar.setId(odontologoGuardado.getId());
+        odontologoAActualizar.setMatricula("A321");
+        Odontologo odontologoActualizado = iOdontologoService.actualizar(odontologoAActualizar);
+        entityManager.detach(odontologoActualizado);
 
         // Assert
-        assertEquals("A321", odontologoActualizado.getMatricula());
+        assertAll(
+                () -> assertNotEquals(odontologoGuardado, odontologoActualizado),
+                () -> assertEquals("A321", odontologoActualizado.getMatricula())
+        );
     }
 
     @DisplayName("Listar odontologos")
@@ -95,9 +112,9 @@ public class OdontologoServiceTests {
     public void testListarOdontologos() {
         // Arrange
         Odontologo odontologo1 = crearOdontologo();
-        iOdontologoService.guardar(odontologo1);
         Odontologo odontologo2 = crearOdontologo();
         odontologo2.setMatricula("A321");
+        iOdontologoService.guardar(odontologo1);
         iOdontologoService.guardar(odontologo2);
 
         // Act
@@ -113,13 +130,14 @@ public class OdontologoServiceTests {
     public void testBuscarOdontologoPorMatricula() {
         // Arrange
         Odontologo odontologo = crearOdontologo();
-        iOdontologoService.guardar(odontologo);
+        Odontologo odontologoGuardado = iOdontologoService.guardar(odontologo);
+        entityManager.detach(odontologoGuardado);
 
         // Act
-        Odontologo odontologoBuscado = iOdontologoService.buscarPorMatricula(odontologo.getMatricula());
+        Odontologo odontologoBuscado = iOdontologoService.buscarPorMatricula(odontologoGuardado.getMatricula());
 
         // Assert
-        assertEquals(odontologo.getMatricula(), odontologoBuscado.getMatricula());
+        assertEquals(odontologoGuardado, odontologoBuscado);
     }
 
 }

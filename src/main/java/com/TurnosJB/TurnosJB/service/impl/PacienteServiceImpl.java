@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+
 @Service
 public class PacienteServiceImpl implements IPacienteService {
 
@@ -92,7 +94,43 @@ public class PacienteServiceImpl implements IPacienteService {
     }
 
     @Override
-    public Paciente actualizar(Paciente paciente) throws ConflictException, BadRequestException {
+    public Paciente actualizar(Paciente paciente) throws ConflictException, BadRequestException, ResourceNotFoundException {
+        // Revisamos que exista el id del paciente
+        if (!iPacienteRepository.existsById(paciente.getId())) {
+            throw new ResourceNotFoundException("No se encontró el paciente con id " + paciente.getId());
+        }
+        Optional<Paciente> datosGuardados = iPacienteRepository.findById(paciente.getId());
+        if (datosGuardados.isPresent()) {
+            // Por cada valor nulo o vacío, reemplazamos por el valor guardado
+            if (Optional.ofNullable(paciente.getNombre()).orElse("").isBlank()) {
+                paciente.setNombre(datosGuardados.get().getNombre());
+            }
+            if (Optional.ofNullable(paciente.getApellido()).orElse("").isBlank()) {
+                paciente.setApellido(datosGuardados.get().getApellido());
+            }
+            if (Optional.ofNullable(paciente.getDni()).orElse("").isBlank()) {
+                paciente.setDni(datosGuardados.get().getDni());
+            }
+            if (paciente.getFechaAlta() == null) {
+                paciente.setFechaAlta(datosGuardados.get().getFechaAlta());
+            }
+            if (paciente.getDomicilio() == null) {
+                paciente.setDomicilio(datosGuardados.get().getDomicilio());
+            } else {
+                if (Optional.ofNullable(paciente.getDomicilio().getCalle()).orElse("").isBlank()) {
+                    paciente.getDomicilio().setCalle(datosGuardados.get().getDomicilio().getCalle());
+                }
+                if (Optional.ofNullable(paciente.getDomicilio().getNumero()).orElse(0).equals(0)) {
+                    paciente.getDomicilio().setNumero(datosGuardados.get().getDomicilio().getNumero());
+                }
+                if (Optional.ofNullable(paciente.getDomicilio().getLocalidad()).orElse("").isBlank()) {
+                    paciente.getDomicilio().setLocalidad(datosGuardados.get().getDomicilio().getLocalidad());
+                }
+                if (Optional.ofNullable(paciente.getDomicilio().getProvincia()).orElse("").isBlank()) {
+                    paciente.getDomicilio().setProvincia(datosGuardados.get().getDomicilio().getProvincia());
+                }
+            }
+        }
         // Revisamos que si el nuevo DNI puede cambiar
         Paciente pacienteConElMismoDni = iPacienteRepository.findByDni(paciente.getDni());
         if (pacienteConElMismoDni != null && !pacienteConElMismoDni.getId().equals(paciente.getId())) {
@@ -104,6 +142,7 @@ public class PacienteServiceImpl implements IPacienteService {
             LOGGER.error("El DNI debe ser numérico");
             throw new BadRequestException("El DNI debe ser numérico");
         }
+
         // Revisamos que los campos de Paciente no estén vacíos
         if (Optional.ofNullable(paciente.getNombre()).orElse("").isBlank() ||
                 Optional.ofNullable(paciente.getApellido()).orElse("").isBlank() ||

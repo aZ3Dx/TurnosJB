@@ -73,7 +73,24 @@ public class OdontologoServiceImpl implements IOdontologoService {
     }
 
     @Override
-    public Odontologo actualizar(Odontologo odontologo) {
+    public Odontologo actualizar(Odontologo odontologo) throws ResourceNotFoundException, ConflictException, BadRequestException {
+        // Revisamos que exista el id del odontologo
+        if (!iOdontologoRepository.existsById(odontologo.getId())) {
+            throw new ResourceNotFoundException("No existe un odontologo con el id " + odontologo.getId());
+        }
+        Optional<Odontologo> datosGuardados = iOdontologoRepository.findById(odontologo.getId());
+        if (datosGuardados.isPresent()) {
+           // Por cada valor que sea nulo o vacío, lo reemplazamos por el valor que ya tiene el odontologo
+            if (Optional.ofNullable(odontologo.getNombre()).orElse("").isBlank()) {
+                odontologo.setNombre(datosGuardados.get().getNombre());
+            }
+            if (Optional.ofNullable(odontologo.getApellido()).orElse("").isBlank()) {
+                odontologo.setApellido(datosGuardados.get().getApellido());
+            }
+            if (Optional.ofNullable(odontologo.getMatricula()).orElse("").isBlank()) {
+                odontologo.setMatricula(datosGuardados.get().getMatricula());
+            }
+        }
         // Revisamos que si la nueva matrícula puede cambiar
         Odontologo odontologoConLaMismaMatricula = iOdontologoRepository.findByMatricula(odontologo.getMatricula());
         if (odontologoConLaMismaMatricula != null && !odontologoConLaMismaMatricula.getId().equals(odontologo.getId())) {

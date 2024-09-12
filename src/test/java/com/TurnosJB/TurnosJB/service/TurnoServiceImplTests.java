@@ -4,10 +4,9 @@ import com.TurnosJB.TurnosJB.entity.Domicilio;
 import com.TurnosJB.TurnosJB.entity.Odontologo;
 import com.TurnosJB.TurnosJB.entity.Paciente;
 import com.TurnosJB.TurnosJB.entity.Turno;
-import com.TurnosJB.TurnosJB.service.impl.OdontologoServiceImpl;
-import com.TurnosJB.TurnosJB.service.impl.PacienteServiceImpl;
-import com.TurnosJB.TurnosJB.service.impl.TurnoServiceImpl;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,16 +18,21 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+@DisplayName("Servicio de turno - Tests")
 @SpringBootTest
 public class TurnoServiceImplTests {
-    @Autowired
-    private TurnoServiceImpl turnoService;
 
     @Autowired
-    private PacienteServiceImpl pacienteService;
+    private ITurnoService iTurnoService;
 
     @Autowired
-    private OdontologoServiceImpl odontologoService;
+    private IPacienteService iPacienteService;
+
+    @Autowired
+    private IOdontologoService iOdontologoService;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private Domicilio crearDomicilio() {
         Domicilio domicilio = new Domicilio();
@@ -54,186 +58,182 @@ public class TurnoServiceImplTests {
         odontologo.setNombre("Orales");
         odontologo.setApellido("Olas");
         odontologo.setMatricula("1234");
-        return odontologoService.guardar(odontologo);
+        return odontologo;
     }
 
+    private Turno crearTurno(Paciente paciente, Odontologo odontologo) {
+        Turno turno = new Turno();
+        turno.setPaciente(paciente);
+        turno.setOdontologo(odontologo);
+        turno.setFecha(LocalDate.of(2024, 12, 12));
+        turno.setHora(LocalTime.of(12, 0, 0));
+        return turno;
+    }
+
+    @DisplayName("Guardar turno")
     @Test
     @Transactional
     public void testGuardarTurno() {
         // Arrange
         Paciente paciente = crearPaciente();
-        pacienteService.guardar(paciente);
+        iPacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
-        Turno turno = new Turno();
-        turno.setPaciente(paciente);
-        turno.setOdontologo(odontologo);
-        turno.setFecha(LocalDate.parse("2024-10-10"));
-        turno.setHora(LocalTime.parse("10:00:00"));
+        iOdontologoService.guardar(odontologo);
+        Turno turno = crearTurno(paciente, odontologo);
 
         // Act
-        Turno turnoGuardado = turnoService.guardar(turno);
+        Turno turnoGuardado = iTurnoService.guardar(turno);
 
         // Assert
-        assertAll("Verificar turno guardado",
-                () -> assertNotNull(turnoGuardado.getId()),
-                () -> assertEquals(paciente, turnoGuardado.getPaciente()),
-                () -> assertEquals(odontologo, turnoGuardado.getOdontologo()),
-                () -> assertEquals(LocalDate.parse("2024-10-10"), turnoGuardado.getFecha()),
-                () -> assertEquals(LocalTime.parse("10:00:00"), turnoGuardado.getHora())
+        assertAll(
+                () -> assertEquals(paciente.getNombre(), turnoGuardado.getPaciente().getNombre()),
+                () -> assertEquals(odontologo.getNombre(), turnoGuardado.getOdontologo().getNombre()),
+                () -> assertEquals(LocalDate.of(2024, 12, 12), turnoGuardado.getFecha()),
+                () -> assertEquals(LocalTime.of(12, 0, 0), turnoGuardado.getHora())
         );
     }
 
+    @DisplayName("Buscar turno por id")
     @Test
     @Transactional
     public void testBuscarTurnoPorId() {
         // Arrange
         Paciente paciente = crearPaciente();
-        pacienteService.guardar(paciente);
+        iPacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
-        Turno turno = new Turno();
-        turno.setPaciente(paciente);
-        turno.setOdontologo(odontologo);
-        turno.setFecha(LocalDate.parse("2024-10-10"));
-        turno.setHora(LocalTime.parse("10:00:00"));
-        Turno turnoGuardado = turnoService.guardar(turno);
+        iOdontologoService.guardar(odontologo);
+        Turno turno = crearTurno(paciente, odontologo);
+        Turno turnoGuardado = iTurnoService.guardar(turno);
+        entityManager.detach(turnoGuardado);
 
         // Act
-        Turno turnoBuscado = turnoService.buscarPorId(turnoGuardado.getId());
+        Turno turnoBuscado = iTurnoService.buscarPorId(turnoGuardado.getId());
 
         // Assert
-        assertAll("Verificar turno guardado",
-                () -> assertNotNull(turnoBuscado.getId()),
-                () -> assertEquals(turnoGuardado.getPaciente(), turnoBuscado.getPaciente()),
-                () -> assertEquals(turnoGuardado.getOdontologo(), turnoBuscado.getOdontologo()),
-                () -> assertEquals(turnoGuardado.getFecha(), turnoBuscado.getFecha()),
-                () -> assertEquals(turnoGuardado.getHora(), turnoBuscado.getHora())
-        );
+        assertEquals(turnoGuardado, turnoBuscado);
     }
 
+    @DisplayName("Eliminar turno")
     @Test
     @Transactional
     public void testEliminarTurno() {
         // Arrange
         Paciente paciente = crearPaciente();
-        pacienteService.guardar(paciente);
+        iPacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
-        Turno turno = new Turno();
-        turno.setPaciente(paciente);
-        turno.setOdontologo(odontologo);
-        turno.setFecha(LocalDate.parse("2024-10-10"));
-        turno.setHora(LocalTime.parse("10:00:00"));
-        Turno turnoGuardado = turnoService.guardar(turno);
-        int cantidadTurnosAntes = turnoService.listar().size();
+        iOdontologoService.guardar(odontologo);
+        Turno turno = crearTurno(paciente, odontologo);
+        Turno turnoGuardado = iTurnoService.guardar(turno);
+        entityManager.detach(turnoGuardado);
+        int cantidadTurnosAntes = iTurnoService.listar().size();
 
         // Act
-        turnoService.eliminar(turnoGuardado.getId());
-        int cantidadTurnosDespues = turnoService.listar().size();
+        iTurnoService.eliminar(turnoGuardado.getId());
+        int cantidadTurnosDespues = iTurnoService.listar().size();
 
         // Assert
         assertEquals(cantidadTurnosAntes - 1, cantidadTurnosDespues);
     }
 
+    @DisplayName("Actualizar turno")
     @Test
     @Transactional
     public void testActualizarTurno() {
         // Arrange
         Paciente paciente = crearPaciente();
-        pacienteService.guardar(paciente);
+        iPacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
-        Turno turno = new Turno();
-        turno.setPaciente(paciente);
-        turno.setOdontologo(odontologo);
-        turno.setFecha(LocalDate.parse("2024-10-10"));
-        turno.setHora(LocalTime.parse("10:00:00"));
-        Turno turnoGuardado = turnoService.guardar(turno);
+        iOdontologoService.guardar(odontologo);
+        Turno turno = crearTurno(paciente, odontologo);
+        Turno turnoGuardado = iTurnoService.guardar(turno);
+        entityManager.detach(turnoGuardado);
 
         // Act
-        turnoGuardado.setHora(LocalTime.parse("20:00:00"));
-        Turno turnoActualizado = turnoService.actualizar(turnoGuardado);
+        Turno turnoAActualzar = new Turno();
+        turnoAActualzar.setId(turnoGuardado.getId());
+        turnoAActualzar.setFecha(LocalDate.of(2024, 12, 12));
+        turnoAActualzar.setHora(LocalTime.of(0, 0, 0));
+        turnoAActualzar.setPaciente(turnoGuardado.getPaciente());
+        turnoAActualzar.setOdontologo(turnoGuardado.getOdontologo());
+        //turnoGuardado.setHora(LocalTime.of(0, 0, 0));
+        Turno turnoActualizado = iTurnoService.actualizar(turnoAActualzar);
+        entityManager.detach(turnoActualizado);
 
         // Assert
-        assertEquals(LocalTime.parse("20:00:00"), turnoActualizado.getHora());
+        assertAll(
+                () -> assertNotEquals(turnoGuardado, turnoActualizado),
+                () -> assertEquals(LocalTime.of(0, 0, 0), turnoActualizado.getHora())
+        );
     }
 
+    @DisplayName("Listar turnos")
     @Test
     @Transactional
     public void testListarTurnos() {
         // Arrange
         Paciente paciente1 = crearPaciente();
-        pacienteService.guardar(paciente1);
+        iPacienteService.guardar(paciente1);
         Paciente paciente2 = crearPaciente();
         paciente2.setDni("87654321");
-        pacienteService.guardar(paciente2);
-        Odontologo odontologo = crearOdontologo();
-        Turno turno1 = new Turno();
-        turno1.setPaciente(paciente1);
-        turno1.setOdontologo(odontologo);
-        turno1.setFecha(LocalDate.parse("2024-10-10"));
-        turno1.setHora(LocalTime.parse("10:00:00"));
-        Turno turno2 = new Turno();
-        turno2.setPaciente(paciente2);
-        turno2.setOdontologo(odontologo);
-        turno2.setFecha(LocalDate.parse("2024-10-10"));
-        turno2.setHora(LocalTime.parse("12:00:00"));
-        turnoService.guardar(turno1);
-        turnoService.guardar(turno2);
+        iPacienteService.guardar(paciente2);
+        Odontologo odontologo1 = crearOdontologo();
+        iOdontologoService.guardar(odontologo1);
+        Odontologo odontologo2 = crearOdontologo();
+        odontologo2.setMatricula("4321");
+        iOdontologoService.guardar(odontologo2);
+        Turno turno1 = crearTurno(paciente1, odontologo1);
+        Turno turno2 = crearTurno(paciente2, odontologo2);
+        iTurnoService.guardar(turno1);
+        iTurnoService.guardar(turno2);
 
         // Act
-        List<Turno> turnos = turnoService.listar();
+        List<Turno> turnos = iTurnoService.listar();
 
         // Assert
         assertEquals(2, turnos.size());
     }
 
+    @DisplayName("Listar turnos por paciente")
     @Test
     @Transactional
     public void testListarTurnosPorPaciente() {
         // Arrange
         Paciente paciente = crearPaciente();
-        pacienteService.guardar(paciente);
+        iPacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
-        Turno turno1 = new Turno();
-        turno1.setPaciente(paciente);
-        turno1.setOdontologo(odontologo);
-        turno1.setFecha(LocalDate.parse("2024-10-10"));
-        turno1.setHora(LocalTime.parse("10:00:00"));
-        turnoService.guardar(turno1);
-        Turno turno2 = new Turno();
-        turno2.setPaciente(paciente);
-        turno2.setOdontologo(odontologo);
-        turno2.setFecha(LocalDate.parse("2024-10-20"));
-        turno2.setHora(LocalTime.parse("10:00:00"));
-        turnoService.guardar(turno2);
+        iOdontologoService.guardar(odontologo);
+        Turno turno1 = crearTurno(paciente, odontologo);
+        Turno turno2 = crearTurno(paciente, odontologo);
+        turno2.setFecha(LocalDate.of(2024, 12, 24));
+        iTurnoService.guardar(turno1);
+        iTurnoService.guardar(turno2);
+        Long pacienteId = iPacienteService.listar().getFirst().getId();
 
         // Act
-        List<Turno> turnos = turnoService.obtenerTurnosPorPaciente(paciente.getId());
+        List<Turno> turnos = iTurnoService.obtenerTurnosPorPaciente(pacienteId);
 
         // Assert
         assertEquals(2, turnos.size());
     }
 
+    @DisplayName("Listar turnos por odontologo")
     @Test
     @Transactional
     public void testListarTurnosPorOdontologo() {
         // Arrange
         Paciente paciente = crearPaciente();
-        pacienteService.guardar(paciente);
+        iPacienteService.guardar(paciente);
         Odontologo odontologo = crearOdontologo();
-        Turno turno1 = new Turno();
-        turno1.setPaciente(paciente);
-        turno1.setOdontologo(odontologo);
-        turno1.setFecha(LocalDate.parse("2024-10-10"));
-        turno1.setHora(LocalTime.parse("10:00:00"));
-        turnoService.guardar(turno1);
-        Turno turno2 = new Turno();
-        turno2.setPaciente(paciente);
-        turno2.setOdontologo(odontologo);
-        turno2.setFecha(LocalDate.parse("2024-10-20"));
-        turno2.setHora(LocalTime.parse("10:00:00"));
-        turnoService.guardar(turno2);
+        iOdontologoService.guardar(odontologo);
+        Turno turno1 = crearTurno(paciente, odontologo);
+        Turno turno2 = crearTurno(paciente, odontologo);
+        turno2.setFecha(LocalDate.of(2024, 12, 24));
+        iTurnoService.guardar(turno1);
+        iTurnoService.guardar(turno2);
+        Long odontologoId = iOdontologoService.listar().getFirst().getId();
 
         // Act
-        List<Turno> turnos = turnoService.obtenerTurnosPorOdontologo(odontologo.getId());
+        List<Turno> turnos = iTurnoService.obtenerTurnosPorOdontologo(odontologoId);
 
         // Assert
         assertEquals(2, turnos.size());
