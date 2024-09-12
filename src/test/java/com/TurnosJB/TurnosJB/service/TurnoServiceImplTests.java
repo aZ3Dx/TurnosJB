@@ -6,8 +6,7 @@ import com.TurnosJB.TurnosJB.entity.Paciente;
 import com.TurnosJB.TurnosJB.entity.Turno;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +18,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @DisplayName("Servicio de turno - Tests")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 public class TurnoServiceImplTests {
 
@@ -71,6 +71,7 @@ public class TurnoServiceImplTests {
     }
 
     @DisplayName("Guardar turno")
+    @Order(1)
     @Test
     @Transactional
     public void testGuardarTurno() {
@@ -94,6 +95,7 @@ public class TurnoServiceImplTests {
     }
 
     @DisplayName("Buscar turno por id")
+    @Order(2)
     @Test
     @Transactional
     public void testBuscarTurnoPorId() {
@@ -114,6 +116,7 @@ public class TurnoServiceImplTests {
     }
 
     @DisplayName("Eliminar turno")
+    @Order(3)
     @Test
     @Transactional
     public void testEliminarTurno() {
@@ -136,6 +139,7 @@ public class TurnoServiceImplTests {
     }
 
     @DisplayName("Actualizar turno")
+    @Order(4)
     @Test
     @Transactional
     public void testActualizarTurno() {
@@ -167,6 +171,7 @@ public class TurnoServiceImplTests {
     }
 
     @DisplayName("Listar turnos")
+    @Order(5)
     @Test
     @Transactional
     public void testListarTurnos() {
@@ -194,6 +199,7 @@ public class TurnoServiceImplTests {
     }
 
     @DisplayName("Listar turnos por paciente")
+    @Order(6)
     @Test
     @Transactional
     public void testListarTurnosPorPaciente() {
@@ -217,6 +223,7 @@ public class TurnoServiceImplTests {
     }
 
     @DisplayName("Listar turnos por odontologo")
+    @Order(7)
     @Test
     @Transactional
     public void testListarTurnosPorOdontologo() {

@@ -4,8 +4,7 @@ import com.TurnosJB.TurnosJB.entity.Domicilio;
 import com.TurnosJB.TurnosJB.entity.Paciente;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @DisplayName("Servicio de paciente - Tests")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 public class PacienteServiceTests {
 
@@ -45,6 +45,7 @@ public class PacienteServiceTests {
     }
 
     @DisplayName("Guardar paciente")
+    @Order(1)
     @Test
     @Transactional
     public void testGuardarPaciente() {
@@ -68,6 +69,7 @@ public class PacienteServiceTests {
     }
 
     @DisplayName("Buscar paciente por id")
+    @Order(2)
     @Test
     @Transactional
     public void testBuscarPacientePorId() {
@@ -84,6 +86,7 @@ public class PacienteServiceTests {
     }
 
     @DisplayName("Eliminar paciente")
+    @Order(3)
     @Test
     public void testEliminarPaciente() {
         // Arrange
@@ -101,6 +104,7 @@ public class PacienteServiceTests {
     }
 
     @DisplayName("Actualizar paciente")
+    @Order(4)
     @Test
     @Transactional
     public void testActualizarPaciente() {
@@ -124,6 +128,7 @@ public class PacienteServiceTests {
     }
 
     @DisplayName("Listar pacientes")
+    @Order(5)
     @Test
     @Transactional
     public void testListarPacientes() {
@@ -142,6 +147,7 @@ public class PacienteServiceTests {
     }
 
     @DisplayName("Buscar paciente por dni")
+    @Order(6)
     @Test
     @Transactional
     public void testBuscarPacientePorDni() {

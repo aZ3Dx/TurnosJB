@@ -3,8 +3,7 @@ package com.TurnosJB.TurnosJB.service;
 import com.TurnosJB.TurnosJB.entity.Odontologo;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 @DisplayName("Servicio de odontologo - Tests")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 public class OdontologoServiceTests {
 
@@ -32,6 +32,7 @@ public class OdontologoServiceTests {
     }
 
     @DisplayName("Guardar odontologo")
+    @Order(1)
     @Test
     @Transactional
     public void testGuardarOdontologo() {
@@ -50,6 +51,7 @@ public class OdontologoServiceTests {
     }
 
     @DisplayName("Buscar odontologo por id")
+    @Order(2)
     @Test
     @Transactional
     public void testBuscarOdontologoPorId() {
@@ -67,6 +69,7 @@ public class OdontologoServiceTests {
     }
 
     @DisplayName("Eliminar odontologo")
+    @Order(3)
     @Test
     public void testEliminarOdontologo() {
         // Arrange
@@ -84,6 +87,7 @@ public class OdontologoServiceTests {
     }
 
     @DisplayName("Actualizar odontologo")
+    @Order(4)
     @Test
     @Transactional
     public void testActualizarOdontologo() {
@@ -107,6 +111,7 @@ public class OdontologoServiceTests {
     }
 
     @DisplayName("Listar odontologos")
+    @Order(5)
     @Test
     @Transactional
     public void testListarOdontologos() {
@@ -125,6 +130,7 @@ public class OdontologoServiceTests {
     }
 
     @DisplayName("Buscar odontologo por matricula")
+    @Order(6)
     @Test
     @Transactional
     public void testBuscarOdontologoPorMatricula() {

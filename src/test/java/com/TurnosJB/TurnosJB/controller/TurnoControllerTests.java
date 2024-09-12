@@ -5,8 +5,7 @@ import com.TurnosJB.TurnosJB.entity.Odontologo;
 import com.TurnosJB.TurnosJB.entity.Paciente;
 import com.TurnosJB.TurnosJB.entity.Turno;
 import com.TurnosJB.TurnosJB.service.ITurnoService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,8 +22,11 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
+@DisplayName("Controlador de turnos - Tests")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @WebMvcTest(TurnoController.class)
 public class TurnoControllerTests {
+
     @Autowired
     private MockMvc mvc;
 
@@ -55,6 +57,8 @@ public class TurnoControllerTests {
         given(iTurnoService.obtenerTurnosPorPaciente(1L)).willReturn(turnos);
     }
 
+    @DisplayName("Listar turnos - GET /turnos")
+    @Order(1)
     @Test
     public void testListarTurnos() throws Exception {
         mvc.perform(get("/turnos")
@@ -64,6 +68,8 @@ public class TurnoControllerTests {
                 .andExpect(jsonPath("$[0].paciente.nombre").value("Juan"));
     }
 
+    @DisplayName("Obtener turno por id - GET /turnos/{id}")
+    @Order(2)
     @Test
     public void testConsultarTurnoPorId() throws Exception {
         mvc.perform(get("/turnos/1")
@@ -72,17 +78,21 @@ public class TurnoControllerTests {
                 .andExpect(jsonPath("$['id']").value(1));
     }
 
+    @DisplayName("Actualizar turno - PUT /turnos")
+    @Order(3)
     @Test
     public void testActualizarTurno() throws Exception {
         mvc.perform(put("/turnos")
                         .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"id\":1,\"paciente\":{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-09-10\"}," +
-                        "\"odontologo\":{\"id\":1,\"nombre\":\"Ana\",\"apellido\":\"Martinez\",\"matricula\":\"987654\"}," +
-                        "\"fecha\":\"2024-09-10\",\"hora\":\"10:00\"}"))
+                        .content("{\"id\":1,\"paciente\":{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-09-10\"}," +
+                                "\"odontologo\":{\"id\":1,\"nombre\":\"Ana\",\"apellido\":\"Martinez\",\"matricula\":\"987654\"}," +
+                                "\"fecha\":\"2024-09-10\",\"hora\":\"10:00\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$['id']").value(1));
     }
 
+    @DisplayName("Eliminar turno - DELETE /turnos/{id}")
+    @Order(4)
     @Test
     public void testEliminarTurno() throws Exception {
         mvc.perform(delete("/turnos/1")
@@ -90,17 +100,21 @@ public class TurnoControllerTests {
                 .andExpect(status().isNoContent());
     }
 
+    @DisplayName("Guardar turno - POST /turnos")
+    @Order(5)
     @Test
     public void testGuardarTurno() throws Exception {
         mvc.perform(post("/turnos")
                         .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"paciente\":{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-09-10\"}," +
-                        "\"odontologo\":{\"id\":1,\"nombre\":\"Ana\",\"apellido\":\"Martinez\",\"matricula\":\"987654\"}," +
-                        "\"fecha\":\"2024-09-10\",\"hora\":\"10:00\"}"))
+                        .content("{\"paciente\":{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"123456\",\"fechaAlta\":\"2024-09-10\"}," +
+                                "\"odontologo\":{\"id\":1,\"nombre\":\"Ana\",\"apellido\":\"Martinez\",\"matricula\":\"987654\"}," +
+                                "\"fecha\":\"2024-09-10\",\"hora\":\"10:00\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$['id']").value(1));
     }
 
+    @DisplayName("Listar turnos por paciente - GET /turnos/paciente/{id}")
+    @Order(6)
     @Test
     public void testListarTurnosPorPaciente() throws Exception {
         mvc.perform(get("/turnos/paciente/1")
