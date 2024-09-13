@@ -169,7 +169,7 @@ document.getElementById("btn-guardar-form-editar-odontologo").addEventListener("
         matricula: form.elements["matricula-editar"].value
     };
     try {
-        const response = await fetch("/odontologos/" + odontologo.id, {
+        const response = await fetch("/odontologos", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"

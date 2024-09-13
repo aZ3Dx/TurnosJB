@@ -9,8 +9,6 @@ import com.TurnosJB.TurnosJB.repository.IPacienteRepository;
 import com.TurnosJB.TurnosJB.repository.ITurnoRepository;
 import com.TurnosJB.TurnosJB.service.IPacienteService;
 import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

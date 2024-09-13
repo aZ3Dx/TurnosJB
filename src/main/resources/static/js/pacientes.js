@@ -227,7 +227,7 @@ document.getElementById("btn-guardar-form-editar-paciente").addEventListener("cl
         }
     };
     try {
-        const response = await fetch("/pacientes/" + paciente.id, {
+        const response = await fetch("/pacientes", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"

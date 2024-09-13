@@ -11,8 +11,6 @@ import com.TurnosJB.TurnosJB.service.IOdontologoService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
 import java.util.Optional;
