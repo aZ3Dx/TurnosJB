@@ -2,6 +2,26 @@ document.addEventListener("DOMContentLoaded", function () {
     obtenerTodo();
 });
 
+function mostrarToast(texto, estilo) {
+    const estilos = [
+        {
+            background: "green",
+            color: "white",
+        },
+        {
+            background: "red",
+            color: "white",
+        }
+    ]
+    Toastify({
+        text: texto,
+        duration: 2000,
+        gravity: "top",
+        position: "center",
+        style: estilos[estilo],
+    }).showToast();
+}
+
 // Función para obtener los pacientes
 function obtenerPacientes() {
     fetch("/pacientes")
@@ -157,7 +177,10 @@ function renderizarTurnos(turnos) {
 }
 
 // Enviar formulario de agregar turno
-document.getElementById("btn-agregar-turno").addEventListener("click", function () {
+document.getElementById("btn-agregar-turno").addEventListener("click", async function () {
+    // Ponemos el botón en espera
+    const btnGuardar = document.getElementById("btn-agregar-turno");
+    btnGuardar.setAttribute("aria-busy", "true");
     const form = document.getElementById("form-agregar-turno");
     const turno = {
         fecha: form.elements["fecha"].value,
@@ -169,7 +192,27 @@ document.getElementById("btn-agregar-turno").addEventListener("click", function 
             id: form.elements["odontologo"].value
         }
     };
-    fetch("/turnos", {
+    try {
+        const response = await fetch("/turnos", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(turno)
+        });
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+        obtenerTodo();
+        mostrarToast("Turno agregado exitosamente", 0);
+    } catch (error) {
+        console.error("Hubo un problema con la petición fetch:", error.message);
+        mostrarToast(error.message, 1);
+    } finally {
+        btnGuardar.removeAttribute("aria-busy");
+    }
+    /*fetch("/turnos", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -178,7 +221,9 @@ document.getElementById("btn-agregar-turno").addEventListener("click", function 
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Error al agregar el turno");
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+                    });
                 }
                 return response.json();
             })
@@ -186,19 +231,42 @@ document.getElementById("btn-agregar-turno").addEventListener("click", function 
                 obtenerTodo();
             })
             .catch(error => {
-                console.error("Hubo un problema con la petición fetch:", error);
-            });
+                console.error("Hubo un problema con la petición fetch:", error.message);
+            });*/
 });
 // Enviar formulario de borrar turno
-document.getElementById("btn-guardar-form-borrar-turno").addEventListener("click", function () {
+document.getElementById("btn-guardar-form-borrar-turno").addEventListener("click", async function () {
+    // Ponemos el botón en espera
+    const btnGuardar = document.getElementById("btn-guardar-form-borrar-turno");
+    btnGuardar.setAttribute("aria-busy", "true");
     const form = document.getElementById("form-borrar-turno");
     const pacienteId = form.elements["turno-borrar-id-hidden"].value;
-    fetch("/turnos/" + pacienteId, {
+    try {
+        const response = await fetch("/turnos/" + pacienteId, {
+            method: "DELETE"
+        });
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+        obtenerTodo();
+        // Cierra el modal
+        closeModalAnimation("dialog-borrar-turno");
+        mostrarToast("Turno borrado exitosamente", 0);
+    } catch (error) {
+        console.error("Hubo un problema con la petición fetch:", error.message);
+        mostrarToast(error.message, 1);
+    } finally {
+        btnGuardar.removeAttribute("aria-busy");
+    }
+    /*fetch("/turnos/" + pacienteId, {
             method: "DELETE"
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Error al borrar el turno");
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+                    });
                 }
             })
             .then(data => {
@@ -207,11 +275,14 @@ document.getElementById("btn-guardar-form-borrar-turno").addEventListener("click
                 closeModalAnimation("dialog-borrar-turno");
             })
             .catch(error => {
-                console.error("Hubo un problema con la petición fetch:", error);
-            });
+                console.error("Hubo un problema con la petición fetch:", error.message);
+            });*/
 });
 // Enviar formulario de editar turno
-document.getElementById("btn-guardar-form-editar-turno").addEventListener("click", function () {
+document.getElementById("btn-guardar-form-editar-turno").addEventListener("click", async function () {
+    // Ponemos el botón en espera
+    const btnGuardar = document.getElementById("btn-guardar-form-editar-turno");
+    btnGuardar.setAttribute("aria-busy", "true");
     const form = document.getElementById("form-editar-turno");
     const turno = {
         id: form.elements["turno-editar-id-hidden"].value,
@@ -224,7 +295,29 @@ document.getElementById("btn-guardar-form-editar-turno").addEventListener("click
             id: form.elements["odontologo-editar-id-hidden"].value
         }
     };
-    fetch("/turnos", {
+    try {
+        const response = await fetch("/turnos", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(turno)
+        });
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+        obtenerTodo();
+        // Cierra el modal
+        closeModalAnimation("dialog-editar-turno");
+        mostrarToast("Turno editado exitosamente", 0);
+    } catch (error) {
+        console.error("Hubo un problema con la petición fetch:", error.message);
+        mostrarToast(error.message, 1);
+    } finally {
+        btnGuardar.removeAttribute("aria-busy");
+    }
+    /*fetch("/turnos", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -233,7 +326,9 @@ document.getElementById("btn-guardar-form-editar-turno").addEventListener("click
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Error al editar el turno");
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+                    });
                 }
             })
             .then(data => {
@@ -242,8 +337,8 @@ document.getElementById("btn-guardar-form-editar-turno").addEventListener("click
                 closeModalAnimation("dialog-editar-turno");
             })
             .catch(error => {
-                console.error("Hubo un problema con la petición fetch:", error);
-            });
+                console.error("Hubo un problema con la petición fetch:", error.message);
+            });*/
 });
 
 // Agregar clases al HTML por 400ms

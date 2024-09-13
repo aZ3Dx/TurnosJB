@@ -2,6 +2,26 @@ document.addEventListener("DOMContentLoaded", function () {
     obtenerPacientes();
 });
 
+function mostrarToast(texto, estilo) {
+    const estilos = [
+        {
+            background: "green",
+            color: "white",
+        },
+        {
+            background: "red",
+            color: "white",
+        }
+    ]
+    Toastify({
+        text: texto,
+        duration: 2000,
+        gravity: "top",
+        position: "center",
+        style: estilos[estilo],
+    }).showToast();
+}
+
 // Función para obtener los pacientes
 function obtenerPacientes() {
     fetch("/pacientes")
@@ -80,7 +100,10 @@ function renderizarPacientes(pacientes) {
 }
 
 // Enviar formulario de agregar paciente
-document.getElementById("btn-guardar-form-agregar-paciente").addEventListener("click", function () {
+document.getElementById("btn-guardar-form-agregar-paciente").addEventListener("click", async function () {
+    // Ponemos el botón en espera
+    const btnGuardar = document.getElementById("btn-guardar-form-agregar-paciente");
+    btnGuardar.setAttribute("aria-busy", "true");
     const form = document.getElementById("form-agregar-paciente");
     const paciente = {
         nombre: form.elements["nombre"].value,
@@ -93,7 +116,26 @@ document.getElementById("btn-guardar-form-agregar-paciente").addEventListener("c
             provincia: form.elements["provincia"].value
         }
     };
-    fetch("/pacientes", {
+    try {
+        const response = await fetch("/pacientes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(paciente)
+        });
+        const data = await response.json();
+        obtenerPacientes();
+        // Cierra el modal
+        closeModalAnimation("dialog-agregar-paciente");
+        mostrarToast("Paciente agregado correctamente", 0);
+    } catch (error) {
+        console.error("Hubo un problema con la petición fetch:", error.message);
+        mostrarToast(error.message, 1);
+    } finally {
+        btnGuardar.removeAttribute("aria-busy");
+    }
+    /*fetch("/pacientes", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -102,7 +144,9 @@ document.getElementById("btn-guardar-form-agregar-paciente").addEventListener("c
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Error al agregar el paciente");
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+                    });
                 }
                 return response.json();
             })
@@ -112,19 +156,42 @@ document.getElementById("btn-guardar-form-agregar-paciente").addEventListener("c
                 closeModalAnimation("dialog-agregar-paciente");
             })
             .catch(error => {
-                console.error("Hubo un problema con la petición fetch:", error);
-            });
+                console.error("Hubo un problema con la petición fetch:", error.message);
+            });*/
 });
 // Enviar formulario de borrar paciente
-document.getElementById("btn-guardar-form-borrar-paciente").addEventListener("click", function () {
+document.getElementById("btn-guardar-form-borrar-paciente").addEventListener("click", async function () {
+    // Ponemos el botón en espera
+    const btnGuardar = document.getElementById("btn-guardar-form-borrar-paciente");
+    btnGuardar.setAttribute("aria-busy", "true");
     const form = document.getElementById("form-borrar-paciente");
     const pacienteId = form.elements["paciente-borrar-id-hidden"].value;
-    fetch("/pacientes/" + pacienteId, {
+    try {
+        const response = await fetch("/pacientes/" + pacienteId, {
+            method: "DELETE"
+        });
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+        obtenerPacientes();
+        // Cierra el modal
+        closeModalAnimation("dialog-borrar-paciente");
+        mostrarToast("Paciente borrado exitosamente", 0);
+    } catch (error) {
+        console.error("Hubo un problema con la petición fetch:", error.message);
+        mostrarToast(error.message, 1);
+    } finally {
+        btnGuardar.removeAttribute("aria-busy");
+    }
+    /*fetch("/pacientes/" + pacienteId, {
             method: "DELETE"
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Error al borrar el paciente");
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+                    });
                 }
             })
             .then(data => {
@@ -133,11 +200,14 @@ document.getElementById("btn-guardar-form-borrar-paciente").addEventListener("cl
                 closeModalAnimation("dialog-borrar-paciente");
             })
             .catch(error => {
-                console.error("Hubo un problema con la petición fetch:", error);
-            });
+                console.error("Hubo un problema con la petición fetch:", error.message);
+            });*/
 });
 // Enviar formulario de editar paciente
-document.getElementById("btn-guardar-form-editar-paciente").addEventListener("click", function () {
+document.getElementById("btn-guardar-form-editar-paciente").addEventListener("click", async function () {
+    // Ponemos el botón en espera
+    const btnGuardar = document.getElementById("btn-guardar-form-editar-paciente");
+    btnGuardar.setAttribute("aria-busy", "true");
     const form = document.getElementById("form-editar-paciente");
     const paciente = {
         id: form.elements["paciente-editar-id-hidden"].value,
@@ -152,7 +222,29 @@ document.getElementById("btn-guardar-form-editar-paciente").addEventListener("cl
             provincia: form.elements["provincia-editar"].value
         }
     };
-    fetch("/pacientes", {
+    try {
+        const response = await fetch("/pacientes/" + paciente.id, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(paciente)
+        });
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+        obtenerPacientes();
+        // Cierra el modal
+        closeModalAnimation("dialog-editar-paciente");
+        mostrarToast("Paciente editado exitosamente", 0);
+    } catch (error) {
+        console.error("Hubo un problema con la petición fetch:", error.message);
+        mostrarToast(error.message, 1);
+    } finally {
+        btnGuardar.removeAttribute("aria-busy");
+    }
+    /*fetch("/pacientes", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -161,7 +253,9 @@ document.getElementById("btn-guardar-form-editar-paciente").addEventListener("cl
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Error al editar el paciente");
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+                    });
                 }
                 return response.json();
             })
@@ -171,8 +265,8 @@ document.getElementById("btn-guardar-form-editar-paciente").addEventListener("cl
                 closeModalAnimation("dialog-editar-paciente");
             })
             .catch(error => {
-                console.error("Hubo un problema con la petición fetch:", error);
-            });
+                console.error("Hubo un problema con la petición fetch:", error.message);
+            });*/
 });
 
 // Agregar clases al HTML por 400ms

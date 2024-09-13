@@ -2,6 +2,26 @@ document.addEventListener("DOMContentLoaded", function () {
     obtenerOdontologos();
 });
 
+function mostrarToast(texto, estilo) {
+    const estilos = [
+        {
+            background: "green",
+            color: "white",
+        },
+        {
+            background: "red",
+            color: "white",
+        }
+    ]
+    Toastify({
+        text: texto,
+        duration: 2000,
+        gravity: "top",
+        position: "center",
+        style: estilos[estilo],
+    }).showToast();
+}
+
 // Función para obtener los odontólogos
 function obtenerOdontologos() {
     fetch("/odontologos")
@@ -75,58 +95,72 @@ function renderizarOdontologos(odontologos) {
 }
 
 // Enviar formulario de agregar odontologo
-document.getElementById("btn-guardar-form-agregar-odontologo").addEventListener("click", function () {
+document.getElementById("btn-guardar-form-agregar-odontologo").addEventListener("click", async function () {
+    // Ponemos el botón en espera
+    const btnGuardar = document.getElementById("btn-guardar-form-agregar-odontologo");
+    btnGuardar.setAttribute("aria-busy", "true");
     const form = document.getElementById("form-agregar-odontologo");
     const odontologo = {
         nombre: form.elements["nombre"].value,
         apellido: form.elements["apellido"].value,
         matricula: form.elements["matricula"].value
     };
-    fetch("/odontologos", {
+    try {
+        const response = await fetch("/odontologos", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(odontologo)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Error al agregar el odontologo");
-                }
-                return response.json();
-            })
-            .then(data => {
-                obtenerOdontologos();
-                // Cierra el modal
-                closeModalAnimation("dialog-agregar-odontologo");
-            })
-            .catch(error => {
-                console.error("Hubo un problema con la petición fetch:", error);
-            });
+        });
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+        const data = await response.json();
+        obtenerOdontologos();
+        // Cierra el modal
+        closeModalAnimation("dialog-agregar-odontologo");
+        mostrarToast("Odontologo agregado exitosamente", 0);
+    } catch (error) {
+        console.error("Hubo un problema con la petición fetch:", error.message);
+        mostrarToast(error.message, 1);
+    } finally {
+        btnGuardar.removeAttribute("aria-busy");
+    }
 });
 // Enviar formulario de borrar odontologo
-document.getElementById("btn-guardar-form-borrar-odontologo").addEventListener("click", function () {
+document.getElementById("btn-guardar-form-borrar-odontologo").addEventListener("click", async function () {
+    // Ponemos el botón en espera
+    const btnGuardar = document.getElementById("btn-guardar-form-editar-odontologo");
+    btnGuardar.setAttribute("aria-busy", "true");
     const form = document.getElementById("form-borrar-odontologo");
     const odontologoId = form.elements["odontologo-borrar-id-hidden"].value;
-    fetch("/odontologos/" + odontologoId, {
-            method: "DELETE"
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Error al borrar el odontologo");
-                }
-            })
-            .then(data => {
-                obtenerOdontologos();
-                // Cierra el modal
-                closeModalAnimation("dialog-borrar-odontologo");
-            })
-            .catch(error => {
-                console.error("Hubo un problema con la petición fetch:", error);
-            });
+    try {
+        const response = await fetch("/odontologos/" + odontologoId, {
+               method: "DELETE"
+        });
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+        obtenerOdontologos();
+        // Cierra el modal
+        closeModalAnimation("dialog-borrar-odontologo");
+        mostrarToast("Odontologo borrado exitosamente", 0);
+    } catch (error) {
+        console.error("Hubo un problema con la petición fetch:", error.message);
+        mostrarToast(error.message, 1);
+    } finally {
+        btnGuardar.removeAttribute("aria-busy");
+    }
+
 });
 // Enviar formulario de editar odontologo
-document.getElementById("btn-guardar-form-editar-odontologo").addEventListener("click", function () {
+document.getElementById("btn-guardar-form-editar-odontologo").addEventListener("click", async function () {
+    // Ponemos el botón en espera
+    const btnGuardar = document.getElementById("btn-guardar-form-editar-odontologo");
+    btnGuardar.setAttribute("aria-busy", "true");
     const form = document.getElementById("form-editar-odontologo");
     const odontologo = {
         id: form.elements["odontologo-editar-id-hidden"].value,
@@ -134,7 +168,29 @@ document.getElementById("btn-guardar-form-editar-odontologo").addEventListener("
         apellido: form.elements["apellido-editar"].value,
         matricula: form.elements["matricula-editar"].value
     };
-    fetch("/odontologos", {
+    try {
+        const response = await fetch("/odontologos/" + odontologo.id, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(odontologo)
+        });
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+        obtenerOdontologos();
+        // Cierra el modal
+        closeModalAnimation("dialog-editar-odontologo");
+        mostrarToast("Odontologo editado exitosamente", 0);
+    } catch (error) {
+        console.error("Hubo un problema con la petición fetch:", error.message);
+        mostrarToast(error.message, 1);
+    } finally {
+        btnGuardar.removeAttribute("aria-busy");
+    }
+    /*fetch("/odontologos", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -143,7 +199,9 @@ document.getElementById("btn-guardar-form-editar-odontologo").addEventListener("
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Error al editar el odontologo");
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+                    });
                 }
                 return response.json();
             })
@@ -153,8 +211,8 @@ document.getElementById("btn-guardar-form-editar-odontologo").addEventListener("
                 closeModalAnimation("dialog-editar-odontologo");
             })
             .catch(error => {
-                console.error("Hubo un problema con la petición fetch:", error);
-            });
+                console.error("Hubo un problema con la petición fetch:", error.message);
+            });*/
 });
 
 // Agregar clases al HTML por 400ms
