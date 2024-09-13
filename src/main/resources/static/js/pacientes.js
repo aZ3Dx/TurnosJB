@@ -124,6 +124,10 @@ document.getElementById("btn-guardar-form-agregar-paciente").addEventListener("c
             },
             body: JSON.stringify(paciente)
         });
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
         const data = await response.json();
         obtenerPacientes();
         // Cierra el modal

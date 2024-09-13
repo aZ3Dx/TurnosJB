@@ -174,6 +174,7 @@ function renderizarTurnos(turnos) {
     });
     funcionalidadBtnBorrar();
     funcionalidadBtnEditar();
+    funcionalidadBtnVer();
 }
 
 // Enviar formulario de agregar turno
@@ -409,4 +410,46 @@ document.getElementById("btn-cancelar-form-editar-turno").addEventListener("clic
 });
 document.getElementById("btn-close-form-editar-turno").addEventListener("click", function () {
     closeModalAnimation("dialog-editar-turno");
+});
+
+// Abir el modal de ver turno
+function funcionalidadBtnVer() {
+    const btnsVer = document.getElementsByClassName("btn-ver");
+    for (let btn of btnsVer) {
+        btn.addEventListener("click", function () {
+            openModalAnimation("dialog-ver-turno");
+            // Asignar el id del turno al abrir el modal
+            const turnoId = this.getAttribute("data-turno-id");
+            // Cargar los datos del turno
+            obtenerTurno(turnoId).then(turno => {
+                const datosPaciente = document.getElementById("ver-datos-paciente");
+                const datosOdontologo = document.getElementById("ver-datos-odontologo");
+                const datosTurno = document.getElementById("ver-datos-turno");
+
+                datosPaciente.innerHTML = "";
+                datosOdontologo.innerHTML = "";
+                datosTurno.innerHTML = "";
+
+                datosPaciente.innerHTML += `
+                <li>Nombre: ${turno.paciente.nombre}</li>
+                <li>Apellido: ${turno.paciente.apellido}</li>
+                <li>DNI: ${turno.paciente.dni}</li>
+                <li>Dirección: ${turno.paciente.domicilio.calle}, ${turno.paciente.domicilio.numero}, ${turno.paciente.domicilio.localidad}, ${turno.paciente.domicilio.provincia}</li>
+                `;
+                datosOdontologo.innerHTML += `
+                <li>Nombre: ${turno.odontologo.nombre}</li>
+                <li>Apellido: ${turno.odontologo.apellido}</li>
+                <li>Matricula: ${turno.odontologo.matricula}</li>
+                `;
+                datosTurno.innerHTML += `
+                <li>Fecha: ${turno.fecha}</li>
+                <li>Hora: ${turno.hora}</li>
+                `;
+            })
+        });
+    }
+}
+// Cerrar o cancelar el modal de ver turno
+document.getElementById("btn-close-ver-turno").addEventListener("click", function () {
+    closeModalAnimation("dialog-ver-turno");
 });
