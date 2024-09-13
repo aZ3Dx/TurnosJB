@@ -8,6 +8,9 @@ import com.TurnosJB.TurnosJB.exception.ResourceNotFoundException;
 import com.TurnosJB.TurnosJB.repository.IPacienteRepository;
 import com.TurnosJB.TurnosJB.repository.ITurnoRepository;
 import com.TurnosJB.TurnosJB.service.IPacienteService;
+import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
+@Log4j2
 @Service
 public class PacienteServiceImpl implements IPacienteService {
 
@@ -25,7 +26,6 @@ public class PacienteServiceImpl implements IPacienteService {
     private final ITurnoRepository iTurnoRepository;
 
     private static final Logger LOGGER = LogManager.getLogger(PacienteServiceImpl.class);
-
 
     @Autowired
     public PacienteServiceImpl(IPacienteRepository iPacienteRepository, ITurnoRepository iTurnoRepository) {
@@ -36,6 +36,7 @@ public class PacienteServiceImpl implements IPacienteService {
     @Override
     public Paciente guardar(Paciente paciente) throws ConflictException, BadRequestException {
         LOGGER.info("Comenzamos a persistir un paciente");
+        log.warn("Comenzamos a persistir un paciente");
 
         paciente.setFechaAlta(LocalDate.now());
         // Revisamos que no hayan pacientes con el mismo dni
@@ -75,7 +76,7 @@ public class PacienteServiceImpl implements IPacienteService {
     public Paciente buscarPorId(Long id) throws ResourceNotFoundException {
         Optional<Paciente> paciente = iPacienteRepository.findById(id);
         if (paciente.isPresent()) {
-            LOGGER.info(paciente.get());
+            LOGGER.info(String.valueOf(paciente.get()));
             return paciente.get();
         } else {
             LOGGER.error("No se encontró el paciente con id " + id);
